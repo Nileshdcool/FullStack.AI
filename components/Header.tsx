@@ -39,7 +39,7 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
     <header className="bg-gray-900 text-white p-4 flex items-center justify-between">
     <div className="flex items-center">
       <img src="/logo.png" alt="Logo" className="h-8 w-8 mr-2" />
-      <h1 className="text-2xl font-bold">FullStack.AI</h1>
+      <h1 className="text-2xl font-bold">Elevar.AI</h1>
     </div>
     <div className="flex items-center">
       <button className="bg-blue-500 text-white px-4 py-2 rounded mr-4" onClick={openLoginSignupModal}>Login</button>

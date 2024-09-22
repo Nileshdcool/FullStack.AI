@@ -25,6 +25,18 @@ export function IndustryButtonToggle({ selectedIndustry, setSelectedIndustry }: 
             >
             Finance
             </button>
+            <button
+            className={`px-4 py-2 rounded-full transition duration-300 ease-in-out transform hover:scale-105 ${selectedIndustry === "Education" ? "bg-purple-500 text-white" : "bg-purple-200 text-purple-700"}`}
+            onClick={() => setSelectedIndustry("Education")}
+            >
+            Education
+            </button>
+            <button
+            className={`px-4 py-2 rounded-full transition duration-300 ease-in-out transform hover:scale-105 ${selectedIndustry === "Manufacturing" ? "bg-red-500 text-white" : "bg-red-200 text-red-700"}`}
+            onClick={() => setSelectedIndustry("Manufacturing")}
+            >
+            Manufacturing
+            </button>
         </div>
     );
 }

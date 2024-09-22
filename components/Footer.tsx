@@ -40,13 +40,13 @@ export default function Footer() {
                 </div>
                 <div>
                     <h2 className="text-xl font-bold mb-2">Contact Us</h2>
-                    <p>Email: support@fullstack.ai</p>
+                    <p>Email: support@Elevar.AI</p>
                     <p>Phone: +1 234 567 890</p>
                     <p>Address: 123 AI Street, Tech City, USA</p>
                 </div>
             </div>
             <div className="text-center mt-4">
-                &copy; 2023 FullStack.AI
+                &copy; 2023 Elevar.AI
             </div>
         </footer>
     )

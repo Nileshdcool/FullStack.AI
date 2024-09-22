@@ -1,3 +1,4 @@
+import { qaList } from '@/data/questionsAnswerList';
 import React, { useState, useEffect } from 'react';
 
 interface ITContentProps {
@@ -19,15 +20,9 @@ export function ITContent({ activeTab, setActiveTab }: ITContentProps) {
         'Linear Regression', 'Logistic Regression', 'Decision Trees', 'Random Forests', 'Support Vector Machines', 'Neural Networks', 'K-Means Clustering', 'Principal Component Analysis'
     ];
 
-    const qaList = [
-        { question: "What is React?", answer: "React is a JavaScript library for building user interfaces.", badge: 'React' },
-        { question: "What is Node.js?", answer: "Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.", badge: 'Node.js' },
-        { question: "What is Django?", answer: "Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design.", badge: 'Django' }
-    ];
-
     const [selectedBadge, setSelectedBadge] = useState<string>(fullStackTechNames[0]);
 
-    const filteredQaList = selectedBadge ? qaList.filter(qa => qa.badge === selectedBadge) : qaList;
+    const [filteredQaList, setFilteredQaList] = useState(qaList.filter(qa => qa.badge === selectedBadge));
 
     useEffect(() => {
         if (activeTab === 'Full-Stack, Web & Mobile') {
@@ -40,6 +35,10 @@ export function ITContent({ activeTab, setActiveTab }: ITContentProps) {
             setSelectedBadge(dataSciencMlTechNames[0]);
         }
     }, [activeTab]);
+
+    useEffect(() => {
+        setFilteredQaList(qaList.filter(qa => qa.badge === selectedBadge));
+    }, [selectedBadge]);
 
     return (
         <>
@@ -137,14 +136,36 @@ export function ITContent({ activeTab, setActiveTab }: ITContentProps) {
                     )}
                 </div>
             </section>
-            <section className="my-8">
-                <h2 className="text-2xl font-bold mb-4">Questions & Answers</h2>
+            <section className="my-8 border border-gray-300 p-4">
+                {filteredQaList.length > 0 && (
+                    <h2 className="text-2xl font-bold mb-4 text-center">
+                        Top {filteredQaList.length} {selectedBadge} Interview Questions
+                    </h2>
+                )}
                 <div className="space-y-4">
                     {filteredQaList.map((qa, index) => (
                         <details key={index} className="bg-gray-100 p-4 rounded shadow-md">
-                            <summary className="cursor-pointer font-semibold">{qa.question}</summary>
-                            <p className="mt-2">{qa.answer}</p>
-                        </details>
+                        <summary className="cursor-pointer font-semibold flex items-center justify-between">
+                            <span>
+                                {qa.question}
+                            </span>
+                            <div className="flex items-center">
+                                <span className={`text-sm mr-2 px-2 py-1 rounded ${qa.level === 'Beginner' ? 'bg-green-500 text-white' : qa.level === 'Intermediate' ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white'}`}>
+                                    {qa.level}
+                                </span>
+                                <input
+                                    type="checkbox"
+                                    className="ml-2"
+                                    onChange={(e) => {
+                                        const updatedQaList = [...filteredQaList];
+                                        updatedQaList[index].done = e.target.checked;
+                                        setFilteredQaList(updatedQaList);
+                                    }}
+                                />
+                            </div>
+                        </summary>
+                        <p className="mt-2">{qa.answer}</p>
+                    </details>
                     ))}
                 </div>
             </section>

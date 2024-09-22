@@ -6,18 +6,18 @@ export default function TermsPage() {
       <h1 className="text-5xl font-extrabold text-gray-800 mb-6">Terms of Service</h1>
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-3xl">
         <p className="text-lg text-gray-700 mb-4">
-          Welcome to FullStack.AI. These terms and conditions outline the rules and regulations for the use of our website.
+          Welcome to Elevar.AI. These terms and conditions outline the rules and regulations for the use of our website.
         </p>
         <p className="text-lg text-gray-700 mb-4">
-          By accessing this website we assume you accept these terms and conditions. Do not continue to use FullStack.AI if you do not agree to all of the terms and conditions stated on this page.
+          By accessing this website we assume you accept these terms and conditions. Do not continue to use Elevar.AI if you do not agree to all of the terms and conditions stated on this page.
         </p>
         <h2 className="text-2xl font-bold text-gray-800 mb-4">License</h2>
         <p className="text-lg text-gray-700 mb-4">
-          Unless otherwise stated, FullStack.AI and/or its licensors own the intellectual property rights for all material on FullStack.AI. All intellectual property rights are reserved. You may access this from FullStack.AI for your own personal use subjected to restrictions set in these terms and conditions.
+          Unless otherwise stated, Elevar.AI and/or its licensors own the intellectual property rights for all material on Elevar.AI. All intellectual property rights are reserved. You may access this from Elevar.AI for your own personal use subjected to restrictions set in these terms and conditions.
         </p>
         <h2 className="text-2xl font-bold text-gray-800 mb-4">User Comments</h2>
         <p className="text-lg text-gray-700 mb-4">
-          Parts of this website offer an opportunity for users to post and exchange opinions and information in certain areas of the website. FullStack.AI does not filter, edit, publish or review Comments prior to their presence on the website. Comments do not reflect the views and opinions of FullStack.AI, its agents, and/or affiliates. Comments reflect the views and opinions of the person who posts their views and opinions.
+          Parts of this website offer an opportunity for users to post and exchange opinions and information in certain areas of the website. Elevar.AI does not filter, edit, publish or review Comments prior to their presence on the website. Comments do not reflect the views and opinions of Elevar.AI, its agents, and/or affiliates. Comments reflect the views and opinions of the person who posts their views and opinions.
         </p>
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Hyperlinking to our Content</h2>
         <p className="text-lg text-gray-700 mb-4">

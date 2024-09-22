@@ -44,7 +44,7 @@ export default function SubscriptionModal({ isModalOpen, closeModal }: Subscript
                 <h2 className="text-xl font-bold text-center">Open 3877 Answers Now</h2>
                 <p className="text-center">Don&#39;t Let Small Mistake Cost You a Job</p>
                 <div className="flex justify-around space-x-4">
-                    <div className="bg-white p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105">
+                    <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105">
                         <div className="text-center">
                             <p className="text-lg font-semibold text-blue-600">$39.99 USD</p>
                             <p>7 Days Access</p>
@@ -54,7 +54,7 @@ export default function SubscriptionModal({ isModalOpen, closeModal }: Subscript
                             <p>No PDF Export</p>
                         </div>
                     </div>
-                    <div className="bg-white p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105">
+                    <div className="bg-gradient-to-r from-green-100 to-green-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105">
                         <div className="text-center">
                             <p className="text-lg font-semibold text-blue-600">$49.99 USD</p>
                             <p>20 Days Access</p>
@@ -64,7 +64,7 @@ export default function SubscriptionModal({ isModalOpen, closeModal }: Subscript
                             <p>No PDF Export</p>
                         </div>
                     </div>
-                    <div className="bg-white p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105">
+                    <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105">
                         <div className="text-center">
                             <p className="text-lg font-semibold text-blue-600">$69.99 USD</p>
                             <p>Lifetime Access 🤘</p>
