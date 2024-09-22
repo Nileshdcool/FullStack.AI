@@ -34,41 +34,77 @@ export default function Sidebar({ toggleSidebar, isCollapsed, selectedIndustry }
                     </details>
                 </li>
                 <li>
-                    <Link legacyBehavior href="/ai-mock-interview">
-                        <a>AI Mock Interview</a>
-                    </Link>
+                    <details>
+                        <summary className="cursor-pointer">AI Mock Interview</summary>
+                        <ul className="ml-4">
+                            <li><Link legacyBehavior href="/ai-mock-interview/coding-interview"><a>Coding Interview</a></Link></li>
+                            <li><Link legacyBehavior href="/ai-mock-interview/system-design-interview"><a>System Design Interview</a></Link></li>
+                            <li><Link legacyBehavior href="/ai-mock-interview/behavioral-interview"><a>Behavioral Interview</a></Link></li>
+                        </ul>
+                    </details>
                 </li>
                 <li>
-                    <Link legacyBehavior href="/learning-paths">
-                        <a>Learning Paths</a>
-                    </Link>
+                    <details>
+                        <summary className="cursor-pointer">Learning Paths</summary>
+                        <ul className="ml-4">
+                            <li><Link legacyBehavior href="/learning-paths/roadmaps-by-role"><a>Roadmaps by Role</a></Link></li>
+                            <li><Link legacyBehavior href="/learning-paths/technology-specific-roadmaps"><a>Technology-Specific Roadmaps</a></Link></li>
+                            <li><Link legacyBehavior href="/learning-paths/personalized-learning-path"><a>Personalized Learning Path</a></Link></li>
+                        </ul>
+                    </details>
                 </li>
                     </>
                 )}
                 <li>
-                    <Link legacyBehavior href="/company-specific-prep">
-                        <a>Company-Specific Prep</a>
-                    </Link>
+                    <details>
+                        <summary className="cursor-pointer">Company-Specific Prep</summary>
+                        <ul className="ml-4">
+                            <li><Link legacyBehavior href="/company-specific-prep/interview-questions-by-company"><a>Interview Questions by Company</a></Link></li>
+                            <li><Link legacyBehavior href="/company-specific-prep/interview-insights-by-role"><a>Interview Insights by Role</a></Link></li>
+                            <li><Link legacyBehavior href="/company-specific-prep/mock-interviews-by-company"><a>Mock Interviews by Company</a></Link></li>
+                        </ul>
+                    </details>
                 </li>
                 <li>
-                    <Link legacyBehavior href="/code-playground">
-                        <a>Code Playground</a>
-                    </Link>
+                    <details>
+                        <summary className="cursor-pointer">Code Playground</summary>
+                        <ul className="ml-4">
+                            <li><a href="#">Integrated Code Editor</a></li>
+                            <li><a href="#">Collaboration Mode</a></li>
+                        </ul>
+                    </details>
                 </li>
                 <li>
-                    <Link legacyBehavior href="/community">
-                        <a>Community</a>
-                    </Link>
+                    <details>
+                        <summary className="cursor-pointer">Community</summary>
+                        <ul className="ml-4">
+                            <li><Link legacyBehavior href="#"><a>Discussion Forum</a></Link></li>
+                            <li><Link legacyBehavior href="#"><a>Mentorship Program</a></Link></li>
+                            <li><Link legacyBehavior href="#"><a>User-Generated Questions</a></Link></li>
+                        </ul>
+                    </details>
                 </li>
                 <li>
-                    <Link legacyBehavior href="/job-prep-tools">
-                        <a>Job Prep Tools</a>
-                    </Link>
+                    <details>
+                        <summary className="cursor-pointer">Job Prep Tools</summary>
+                        <ul className="ml-4">
+                            <li><Link legacyBehavior href="#"><a>Resume Builder</a></Link></li>
+                            <li><Link legacyBehavior href="#"><a>Portfolio Builder</a></Link></li>
+                            <li><Link legacyBehavior href="#"><a>Job Search</a></Link></li>
+                            <li><Link legacyBehavior href="#"><a>Company Research Tool</a></Link></li>
+                        </ul>
+                    </details>
                 </li>
                 <li>
-                    <Link legacyBehavior href="/profile">
-                        <a>Profile</a>
-                    </Link>
+                    <details>
+                        <summary className="cursor-pointer">Profile</summary>
+                        <ul className="ml-4">
+                            <li><Link legacyBehavior href="#"><a>Dashboard</a></Link></li>
+                            <li><Link legacyBehavior href="#"><a>Bookmarks</a></Link></li>
+                            <li><Link legacyBehavior href="#"><a>Completed Quizzes & Challenges</a></Link></li>
+                            <li><Link legacyBehavior href="#"><a>Settings</a></Link></li>
+                        </ul>
+                    </details>
                 </li>
                 <li>
                     <Link legacyBehavior href="/about">
