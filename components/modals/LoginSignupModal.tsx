@@ -20,7 +20,7 @@ const customStyles = {
     transform: 'translate(-50%, -50%)',
     width: '400px',
     padding: '20px',
-    position: 'relative' as 'relative', // Ensure relative positioning for the close icon
+    position: 'relative' as const, // Ensure relative positioning for the close icon
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.75)',

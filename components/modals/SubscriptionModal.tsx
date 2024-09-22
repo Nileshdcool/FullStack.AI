@@ -42,7 +42,7 @@ export default function SubscriptionModal({ isModalOpen, closeModal }: Subscript
                     <FaTimes className="text-2xl" />
                 </button>
                 <h2 className="text-xl font-bold text-center">Open 3877 Answers Now</h2>
-                <p className="text-center">Don't Let Small Mistake Cost You a Job</p>
+                <p className="text-center">Don&#39;t Let Small Mistake Cost You a Job</p>
                 <div className="flex justify-around space-x-4">
                     <div className="bg-white p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105">
                         <div className="text-center">

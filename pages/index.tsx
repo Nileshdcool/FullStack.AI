@@ -2,7 +2,7 @@ import { SetStateAction, useState } from "react";
 import { ITContent } from "../components/features/ITContent";
 import { HealthcareContent } from "@/components/features/Healthcare";
 import { FinanceContent } from "@/components/features/Finance";
-import { IndustryButtonToggle, IndustrySelectToggle } from "@/components/IndustryToggle";
+import { IndustryButtonToggle } from "@/components/IndustryToggle";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('Full-Stack, Web & Mobile');
