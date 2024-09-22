@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface SidebarProps {
     toggleSidebar: () => void;
@@ -7,6 +8,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ toggleSidebar, isCollapsed, selectedIndustry }: SidebarProps) {
+    const router = useRouter();
+    const isActive = (href: string) => router.pathname === href;
     return (
         <aside className={`bg-gray-800 text-white p-4 transition-width duration-300 ${isCollapsed ? "w-16" : "w-64"}`}>
         <button onClick={toggleSidebar} className="mb-4">
@@ -14,25 +17,25 @@ export default function Sidebar({ toggleSidebar, isCollapsed, selectedIndustry }
         </button>
         <nav>
             <ul>
-                <li>
-                    <Link legacyBehavior href="/">
-                        <a>Home</a>
-                    </Link>
-                </li>
+            <li>
+                <Link legacyBehavior href="/">
+                    <a className={isActive("/") ? "bg-blue-700" : ""}>Home</a>
+                </Link>
+            </li>
                 {selectedIndustry === "IT" && (
                     <>
                     <li>
-                    <details>
-                        <summary className="cursor-pointer">Practice</summary>
-                        <ul className="ml-4">
-                            <li><Link legacyBehavior href="/practice/coding-challenges"><a>Coding Challenges</a></Link></li>
-                            <li><Link legacyBehavior href="/practice/system-design"><a>System Design</a></Link></li>
-                            <li><Link legacyBehavior href="/practice/quiz-mode"><a>Quiz Mode</a></Link></li>
-                            <li><Link legacyBehavior href="/practice/mock-interview-challenges"><a>Mock Interview Challenges</a></Link></li>
-                            <li><Link legacyBehavior href="/practice/code-refactor-challenges"><a>Code Refactor Challenges</a></Link></li>
-                        </ul>
-                    </details>
-                </li>
+                                <details>
+                                    <summary className="cursor-pointer">Practice</summary>
+                                    <ul className="ml-4">
+                                        <li><Link legacyBehavior href="/practice/coding-challenges"><a className={isActive("/practice/coding-challenges") ? "bg-blue-500" : ""}>Coding Challenges</a></Link></li>
+                                        <li><Link legacyBehavior href="/practice/system-design"><a className={isActive("/practice/system-design") ? "bg-blue-500" : ""}>System Design</a></Link></li>
+                                        <li><Link legacyBehavior href="/practice/quiz-mode"><a className={isActive("/practice/quiz-mode") ? "bg-blue-500" : ""}>Quiz Mode</a></Link></li>
+                                        <li><Link legacyBehavior href="/practice/mock-interview-challenges"><a className={isActive("/practice/mock-interview-challenges") ? "bg-blue-500" : ""}>Mock Interview Challenges</a></Link></li>
+                                        <li><Link legacyBehavior href="/practice/code-refactor-challenges"><a className={isActive("/practice/code-refactor-challenges") ? "bg-blue-500" : ""}>Code Refactor Challenges</a></Link></li>
+                                    </ul>
+                                </details>
+                            </li>
                 <li>
                     <details>
                         <summary className="cursor-pointer">AI Mock Interview</summary>

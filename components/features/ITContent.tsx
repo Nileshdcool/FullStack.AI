@@ -150,6 +150,9 @@ export function ITContent({ activeTab, setActiveTab }: ITContentProps) {
                                 {qa.question}
                             </span>
                             <div className="flex items-center">
+                            <span className={`text-sm mr-2 px-2 py-1 rounded bg-orange-500 text-white`}>
+                                    Add To PDF
+                                </span>
                                 <span className={`text-sm mr-2 px-2 py-1 rounded ${qa.level === 'Beginner' ? 'bg-green-500 text-white' : qa.level === 'Intermediate' ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white'}`}>
                                     {qa.level}
                                 </span>
