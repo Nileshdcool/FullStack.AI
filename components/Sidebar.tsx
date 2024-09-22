@@ -3,9 +3,10 @@ import Link from "next/link";
 interface SidebarProps {
     toggleSidebar: () => void;
     isCollapsed: boolean;
+    selectedIndustry: string;
 }
 
-export default function Sidebar({ toggleSidebar, isCollapsed }: SidebarProps) {
+export default function Sidebar({ toggleSidebar, isCollapsed, selectedIndustry }: SidebarProps) {
     return (
         <aside className={`bg-gray-800 text-white p-4 transition-width duration-300 ${isCollapsed ? "w-16" : "w-64"}`}>
         <button onClick={toggleSidebar} className="mb-4">
@@ -18,7 +19,9 @@ export default function Sidebar({ toggleSidebar, isCollapsed }: SidebarProps) {
                         <a>Home</a>
                     </Link>
                 </li>
-                <li>
+                {selectedIndustry === "IT" && (
+                    <>
+                    <li>
                     <details>
                         <summary className="cursor-pointer">Practice</summary>
                         <ul className="ml-4">
@@ -40,6 +43,8 @@ export default function Sidebar({ toggleSidebar, isCollapsed }: SidebarProps) {
                         <a>Learning Paths</a>
                     </Link>
                 </li>
+                    </>
+                )}
                 <li>
                     <Link legacyBehavior href="/company-specific-prep">
                         <a>Company-Specific Prep</a>

@@ -6,9 +6,10 @@ import 'react-slidedown/lib/slidedown.css';
 
 interface HeaderProps {
   openModal: () => void;
+  openLoginSignupModal: () => void;
 }
 
-export default function Header({ openModal }: HeaderProps) {
+export default function Header({ openModal, openLoginSignupModal }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +42,7 @@ export default function Header({ openModal }: HeaderProps) {
       <h1 className="text-2xl font-bold">FullStack.AI</h1>
     </div>
     <div className="flex items-center">
-      <button className="bg-blue-500 text-white px-4 py-2 rounded mr-4">Login</button>
+      <button className="bg-blue-500 text-white px-4 py-2 rounded mr-4" onClick={openLoginSignupModal}>Login</button>
       <button className="bg-green-500 text-white px-4 py-2 rounded mr-4" onClick={openModal}>Unlock 5000+ Answers</button>
       <Avatar
         src="/avatar.png"
