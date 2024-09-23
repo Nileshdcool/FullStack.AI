@@ -1,16 +1,14 @@
-import { SetStateAction, useState } from "react";
+import { useContext, useState } from "react";
 import { ITContent } from "../components/features/ITContent";
 import { HealthcareContent } from "@/components/features/Healthcare";
 import { FinanceContent } from "@/components/features/Finance";
 import { IndustryButtonToggle } from "@/components/IndustryToggle";
+import { AppContext } from "@/context/AppContext";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('Full-Stack, Web & Mobile');
-  const [selectedIndustry, setSelectedIndustry] = useState('IT');
 
-  const handleIndustryChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-    setSelectedIndustry(event.target.value);
-  }
+  const { selectedIndustry } = useContext(AppContext) || {};
 
   return (
     <div className="container mx-auto p-4">
@@ -19,9 +17,7 @@ export default function Home() {
         <p className="text-lg mb-4">
           Discover a wealth of knowledge and resources to help you succeed in your career.
         </p>
-          <IndustryButtonToggle selectedIndustry={selectedIndustry}
-          handleIndustryChange={handleIndustryChange}
-          setSelectedIndustry={setSelectedIndustry} />
+          <IndustryButtonToggle/>
       </section>
       {selectedIndustry === 'IT' && (
         <ITContent activeTab={activeTab} setActiveTab={setActiveTab} />

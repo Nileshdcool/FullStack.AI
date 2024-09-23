@@ -11,7 +11,6 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-    const [isCollapsed, setIsCollapsed] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoginSignupModalOpen, setIsLoginSignupModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
@@ -20,15 +19,9 @@ export default function Layout({ children }: LayoutProps) {
     const openLoginSignupModal = () => setIsLoginSignupModalOpen(true);
     const closeLoginSignupModal = () => setIsLoginSignupModalOpen(false);
 
-
-
-    const toggleSidebar = () => {
-        setIsCollapsed(!isCollapsed);
-    };
-
     return (
         <div className="flex min-h-screen">
-            <Sidebar toggleSidebar={toggleSidebar} isCollapsed={isCollapsed} selectedIndustry={'IT'} />
+            <Sidebar/>
             <div className="flex-1 flex flex-col">
                 <Header openModal={openModal} openLoginSignupModal={openLoginSignupModal}/>
                 <main className="flex-1 p-4">{children}</main>

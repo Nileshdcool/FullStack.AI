@@ -1,20 +1,26 @@
+import { AppContext } from "@/context/AppContext";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useContext } from "react";
+import Avatar from 'react-avatar';
 
-interface SidebarProps {
-    toggleSidebar: () => void;
-    isCollapsed: boolean;
-    selectedIndustry: string;
-}
-
-export default function Sidebar({ toggleSidebar, isCollapsed, selectedIndustry }: SidebarProps) {
+export default function Sidebar() {
     const router = useRouter();
     const isActive = (href: string) => router.pathname === href;
+    const { isSidebarCollapsed, toggleSidebar, selectedIndustry } = useContext(AppContext) || {};
     return (
-        <aside className={`bg-gray-800 text-white p-4 transition-width duration-300 ${isCollapsed ? "w-16" : "w-64"}`}>
+        <aside className={`bg-gray-800 text-white p-4 transition-width duration-300 ${isSidebarCollapsed ? "w-16" : "w-64"}`}>
         <button onClick={toggleSidebar} className="mb-4">
-            {isCollapsed ? "Expand" : "Collapse"}
+            {isSidebarCollapsed ? "Expand" : "Collapse"}
         </button>
+        {!isSidebarCollapsed && (
+                <div className="mb-4 text-center">
+                    <Avatar src={''} size="50" round={true} alt="User Avatar" />
+                    <h2 className="mt-2 text-lg font-bold">Welcome Back</h2>
+                    <p className="text-sm">{'Nilesh Sukalikar'}</p>
+                    <p className="text-xs text-gray-400">{'neil.sukalikar@gmail.com'}</p>
+                </div>
+            )}
         <nav>
             <ul>
             <li>
