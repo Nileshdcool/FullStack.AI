@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import Avatar from 'react-avatar';
 import SlideDown from 'react-slidedown';
@@ -56,9 +57,9 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
         {isMenuOpen && (
           <div className="menu">
             <ul>
-              <li><a href="/profile">Profile</a></li>
-              <li><a href="/settings">Settings</a></li>
-              <li><a href="/logout">Logout</a></li>
+                <li><Link legacyBehavior href="/profile">Profile</Link></li>
+                <li><Link legacyBehavior href="/settings">Settings</Link></li>
+                <li><Link legacyBehavior href="/logout">Logout</Link></li>
             </ul>
           </div>
         )}
