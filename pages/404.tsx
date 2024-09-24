@@ -1,3 +1,4 @@
+// pages/404.tsx
 import Link from 'next/link';
 
 export default function Custom404() {
@@ -12,4 +13,10 @@ export default function Custom404() {
       </Link>
     </div>
   );
+}
+
+export async function getStaticProps() {
+  return {
+    props: {}, // No props needed for the 404 page
+  };
 }

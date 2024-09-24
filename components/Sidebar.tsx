@@ -34,8 +34,8 @@ export default function Sidebar() {
                                 <details>
                                     <summary className="cursor-pointer">Practice</summary>
                                     <ul className="ml-4">
-                                        <li><Link legacyBehavior href="/practice/coding-challenges"><a className={isActive("/practice/coding-challenges") ? "bg-blue-500" : ""}>Coding Challenges</a></Link></li>
-                                        <li><Link legacyBehavior href="/practice/system-design"><a className={isActive("/practice/system-design") ? "bg-blue-500" : ""}>System Design</a></Link></li>
+                                        <li><Link legacyBehavior href="/it/practice/coding-challenge"><a className={isActive("/it/practice/coding-challenges") ? "bg-blue-500" : ""}>Coding Challenges</a></Link></li>
+                                        <li><Link legacyBehavior href="/it/practice/system-design"><a className={isActive("/it/practice/system-design") ? "bg-blue-500" : ""}>System Design</a></Link></li>
                                         <li><Link legacyBehavior href="/practice/quiz-mode"><a className={isActive("/practice/quiz-mode") ? "bg-blue-500" : ""}>Quiz Mode</a></Link></li>
                                         <li><Link legacyBehavior href="/practice/mock-interview-challenges"><a className={isActive("/practice/mock-interview-challenges") ? "bg-blue-500" : ""}>Mock Interview Challenges</a></Link></li>
                                         <li><Link legacyBehavior href="/practice/code-refactor-challenges"><a className={isActive("/practice/code-refactor-challenges") ? "bg-blue-500" : ""}>Code Refactor Challenges</a></Link></li>
@@ -57,7 +57,7 @@ export default function Sidebar() {
                         <summary className="cursor-pointer">Learning Paths</summary>
                         <ul className="ml-4">
                             <li><Link legacyBehavior href="/learning-paths/roadmaps-by-role"><a>Roadmaps by Role</a></Link></li>
-                            <li><Link legacyBehavior href="/learning-paths/technology-specific-roadmaps"><a>Technology-Specific Roadmaps</a></Link></li>
+                            <li><Link legacyBehavior href="/learning-paths/tech-roadmaps"><a>Technology-Specific Roadmaps</a></Link></li>
                             <li><Link legacyBehavior href="/learning-paths/personalized-learning-path"><a>Personalized Learning Path</a></Link></li>
                         </ul>
                     </details>
@@ -97,6 +97,9 @@ export default function Sidebar() {
                     <details>
                         <summary className="cursor-pointer">Job Prep Tools</summary>
                         <ul className="ml-4">
+                        <li><Link legacyBehavior href="#"><a>ATS Scanner</a></Link></li>
+                        <li><Link legacyBehavior href="#"><a>Cl Builder</a></Link></li>
+                        <li><Link legacyBehavior href="#"><a>Auto Apply</a></Link></li>
                             <li><Link legacyBehavior href="#"><a>Resume Builder</a></Link></li>
                             <li><Link legacyBehavior href="#"><a>Portfolio Builder</a></Link></li>
                             <li><Link legacyBehavior href="#"><a>Job Search</a></Link></li>
