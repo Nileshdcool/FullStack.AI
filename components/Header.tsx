@@ -47,7 +47,7 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
         {user ? (
           <>
             <Avatar
-              src="/avatar.png"
+              src={user?.photoURL || ''}
               size="40"
               round={true}
               alt="Avatar"
