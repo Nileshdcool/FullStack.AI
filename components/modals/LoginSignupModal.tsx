@@ -52,13 +52,13 @@ export default function LoginSignupModal({ isModalOpen, closeModal }: LoginSignu
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      if (userCredential) setUser(userCredential.user);
+      if (userCredential && setUser) setUser(userCredential.user);
       closeModal();
     } catch (error) {
       console.error('Error logging in', error);
     }
   };
-
+  
   // Handle third-party authentication (Facebook, Twitter, Google, Github)
   const socialLogin = async (provider: SocialProvider) => {
     try {

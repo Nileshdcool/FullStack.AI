@@ -1,25 +1,32 @@
 import React, { createContext, useState, ReactNode, SetStateAction } from 'react';
 import 'firebase/compat/auth'; // Ensure you're using the correct Firebase auth
 import firebase from 'firebase/compat/app';
-import { getAuth, signOut } from "firebase/auth"; // Import signOut from Firebase
+import { getAuth, signOut, User } from "firebase/auth"; // Import signOut from Firebase
 
 interface AppContextProps {
     isSidebarCollapsed: boolean;
     toggleSidebar: () => void;
     handleIndustryChange: (event: string) => void;
     selectedIndustry: string;
-    user: firebase.User | null;  // Use firebase.User
-    setUser: React.Dispatch<SetStateAction<firebase.User | null>>; // Correct dispatch type
+    user: User | null;  // Use firebase.User
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
     logout: () => void; // Logout function
-  }
+}
 
-
-export const AppContext = createContext<AppContextProps | undefined>(undefined);
+export const AppContext = createContext<AppContextProps>({
+    isSidebarCollapsed: false,
+    toggleSidebar: () => { },
+    handleIndustryChange: () => { },
+    selectedIndustry: '',
+    user: null,
+    setUser: () => { },
+    logout: () => { },
+});
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [selectedIndustry, setSelectedIndustry] = useState('IT');
-     const [user, setUser] = useState<firebase.User | null>(null); // Add user state
+    const [user, setUser] = useState<User | null>(null); // Add user state
 
     const toggleSidebar = () => {
         setIsSidebarCollapsed(prevState => !prevState);
@@ -27,7 +34,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     const handleIndustryChange = (event: string) => {
         setSelectedIndustry(event);
-      }
+    }
 
     // Logout function that clears user data
     const logout = async () => {
