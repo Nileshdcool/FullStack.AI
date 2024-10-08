@@ -64,7 +64,7 @@ export default function LoginSignupModal({ isModalOpen, closeModal }: LoginSignu
     try {
       closeModal();
       const userCredential = await signInWithPopup(auth, provider);
-      debugger;
+      console.log(userCredential.user);
       if (userCredential) setUser(userCredential.user);
     } catch (error) {
       console.error(`Error logging in with ${provider.providerId}:`, error);
