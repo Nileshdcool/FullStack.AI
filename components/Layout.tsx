@@ -13,6 +13,7 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoginSignupModalOpen, setIsLoginSignupModalOpen] = useState(false);
+
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
@@ -21,14 +22,17 @@ export default function Layout({ children }: LayoutProps) {
 
     return (
         <div className="flex min-h-screen">
-            <Sidebar/>
+            <Sidebar />
             <div className="flex-1 flex flex-col">
-                <Header openModal={openModal} openLoginSignupModal={openLoginSignupModal}/>
+                <Header openModal={openModal} openLoginSignupModal={openLoginSignupModal} />
                 <main className="flex-1 p-4">{children}</main>
                 <Footer />
             </div>
             <SubscriptionModal isModalOpen={isModalOpen} closeModal={closeModal} />
-            <LoginSignupModal isModalOpen={isLoginSignupModalOpen} closeModal={closeLoginSignupModal} />
+            <LoginSignupModal 
+                isModalOpen={isLoginSignupModalOpen} 
+                closeModal={closeLoginSignupModal}                 
+            />
         </div>
     );
 }
