@@ -1,33 +1,71 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { fetchData } from '@/utility/apiService';
+import { addSubscription, verifySession, getSubscriptionByPaymentID } from '../../services/stripeService'; // Import the new function
+import { AppContext } from '@/context/AppContext'; // Import your context
+
 
 const SuccessPage = () => {
-    debugger;
     const router = useRouter();
     const { session_id } = router.query; // Get session_id from the URL query params
     const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+    const { setIsSubscribedFlag } = useContext(AppContext); // Access the context
+
+
+    const calculateEndDate = (subscriptionType: string): string => {
+        let endDate: string = "";
+        if (subscriptionType === 'Days7') {
+            endDate = new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0]; // 7 days later
+        } else if (subscriptionType === 'Days20') {
+            endDate = new Date(new Date().setDate(new Date().getDate() + 20)).toISOString().split('T')[0]; // 20 days later
+        } else if (subscriptionType === 'Lifetime') {
+            endDate = ""; // Lifetime subscription
+        }
+        return endDate;
+    };
 
     useEffect(() => {
         const verifyPayment = async () => {
             if (session_id) {
                 try {
-                    // Optionally verify the session with Stripe to confirm successful payment
-                    const session: any = await fetchData(`/api/verify-session/${session_id}`, {
-                        method: 'GET',
-                    });
-                    
+                    // Call the verifySession function to verify the payment session
+                    const session = await verifySession(session_id as string);
+
                     if (session.payment_status === 'paid') {
+                        const userEmail = session.metadata.user_email; // Extract user email
+                        const subscriptionType = session.metadata.plan_name; // Extract subscription type
+                        const endDate = calculateEndDate(subscriptionType);
+                        const stripePaymentID = session.payment_intent;
+
+                        // Check if a subscription with this StripePaymentID already exists
+                        const existingSubscription = await getSubscriptionByPaymentID(stripePaymentID);
+
+                        // If no existing subscription, add a new one
+                        if (!existingSubscription) {
+                            const subscriptionData = {
+                                User: userEmail, // Update with actual user data
+                                SubscriptionType: subscriptionType,
+                                StartDate: new Date().toISOString().split('T')[0], // Current date
+                                EndDate: endDate,
+                                StripePaymentID: stripePaymentID,
+                                StripeSubscriptionID: session.id,
+                                PaymentStatus: session.payment_status,
+                            };
+
+                            // Add the subscription record to Strapi
+                            await addSubscription(subscriptionData);
+                            setIsSubscribedFlag(true);
+                        }
+
                         setPaymentStatus('success');
                     } else {
                         setPaymentStatus('failed');
                     }
                 } catch (error) {
+                    console.log(error);
                     setPaymentStatus('error');
                 }
             }
         };
-
         verifyPayment();
     }, [session_id]);
 

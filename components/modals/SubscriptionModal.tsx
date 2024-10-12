@@ -1,8 +1,10 @@
 import Modal from 'react-modal';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { fetchData } from '@/utility/apiService';
+import { createCheckoutSession } from '../../services/stripeService'; // Import the method
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // Import Firebase authentication
+
 
 // Set the app element for react-modal
 Modal.setAppElement('#__next');
@@ -38,25 +40,30 @@ export default function SubscriptionModal({
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   // const [customerName, setCustomerName] = useState<string>(''); // Added customer name input state
+  const [userEmail, setUserEmail] = useState<string | null>(null); // State to store user email
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserEmail(user.email); // Set the user's email
+      } else {
+        setUserEmail(null); // No user is signed in
+      }
+    });
+
+    return () => unsubscribe(); // Clean up the subscription on unmount
+  }, []);
+
 
   const handleCheckout = async () => {
-    debugger;
-    if (!selectedPlan) {
-      toast.error('Please select a plan and enter your name.');
-      return;
-    }
-
     try {
+      if (!userEmail) {
+        toast.error('User is not logged in.');
+        return;
+      }
       setLoading(true);
-      // 1. Create the checkout session by calling the backend API
-      const res = await fetchData<{ url: string }>('/api/create-checkout-session', {
-        method: 'POST',
-        body: {
-          amount: getSelectedPlanAmount()
-        },
-      });
-
-      // 2. Redirect to Stripe Checkout page
+      const res = await createCheckoutSession(getSelectedPlanAmount(), userEmail, getSelectedPlanDetails());
       if (res.url) {
         window.location.href = res.url; // Redirect user to Stripe's payment page
       } else {
@@ -75,11 +82,11 @@ export default function SubscriptionModal({
 
   const getSelectedPlanAmount = () => {
     switch (selectedPlan) {
-      case 'plan1':
+      case "plan1":
         return 3999; // $39.99 in cents
-      case 'plan2':
+      case "plan2":
         return 4999; // $49.99 in cents
-      case 'plan3':
+      case "plan3":
         return 6999; // $69.99 in cents
       default:
         return 0;
@@ -88,14 +95,27 @@ export default function SubscriptionModal({
 
   const getSelectedPlanLabel = () => {
     switch (selectedPlan) {
-      case 'plan1':
-        return '7 Days Access';
-      case 'plan2':
-        return '20 Days Access';
-      case 'plan3':
-        return 'Lifetime Access';
+      case "plan1":
+        return "7 Days Access";
+      case "plan2":
+        return "20 Days Access";
+      case "plan3":
+        return "Lifetime Access";
       default:
-        return 'No Plan Selected';
+        return "No Plan Selected";
+    }
+  };
+
+  const getSelectedPlanDetails = () => {
+    switch (selectedPlan) {
+      case "plan1":
+        return "Days7";
+      case "plan2":
+        return "Days20";
+      case "plan3":
+        return "Lifetime";
+      default:
+        return "Days0";
     }
   };
 
@@ -111,12 +131,12 @@ export default function SubscriptionModal({
           <FaTimes className="text-2xl" />
         </button>
         <h2 className="text-xl font-bold text-center">Open 3877 Answers Now</h2>
-        <p className="text-center">Don't Let Small Mistake Cost You a Job</p>
+        <p className="text-center">Don&apos;t Let Small Mistake Cost You a Job</p>
         <div className="flex justify-around space-x-4">
           <div
-            className={`bg-gradient-to-r from-blue-100 to-blue-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105 cursor-pointer ${selectedPlan === 'plan1' ? 'border-2 border-blue-500' : ''
+            className={`bg-gradient-to-r from-blue-100 to-blue-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105 cursor-pointer ${selectedPlan === "plan1" ? 'border-2 border-blue-500' : ''
               }`}
-            onClick={() => setSelectedPlan('plan1')}
+            onClick={() => setSelectedPlan("plan1")}
           >
             <div className="text-center">
               <p className="text-lg font-semibold text-blue-600">$39.99 USD</p>
@@ -124,9 +144,9 @@ export default function SubscriptionModal({
             </div>
           </div>
           <div
-            className={`bg-gradient-to-r from-green-100 to-green-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105 cursor-pointer ${selectedPlan === 'plan2' ? 'border-2 border-green-500' : ''
+            className={`bg-gradient-to-r from-green-100 to-green-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105 cursor-pointer ${selectedPlan === "plan2" ? 'border-2 border-green-500' : ''
               }`}
-            onClick={() => setSelectedPlan('plan2')}
+            onClick={() => setSelectedPlan("plan2")}
           >
             <div className="text-center">
               <p className="text-lg font-semibold text-blue-600">$49.99 USD</p>
@@ -134,9 +154,9 @@ export default function SubscriptionModal({
             </div>
           </div>
           <div
-            className={`bg-gradient-to-r from-purple-100 to-purple-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105 cursor-pointer ${selectedPlan === 'plan3' ? 'border-2 border-purple-500' : ''
+            className={`bg-gradient-to-r from-purple-100 to-purple-200 p-4 rounded shadow-md w-1/3 transform transition-transform hover:scale-105 cursor-pointer ${selectedPlan === "plan3" ? 'border-2 border-purple-500' : ''
               }`}
-            onClick={() => setSelectedPlan('plan3')}
+            onClick={() => setSelectedPlan("plan3")}
           >
             <div className="text-center">
               <p className="text-lg font-semibold text-blue-600">$69.99 USD</p>
@@ -150,21 +170,6 @@ export default function SubscriptionModal({
           You have selected the <span className="font-bold text-blue-600">{getSelectedPlanLabel()}</span> plan for
           <span className="font-bold text-blue-600"> ${((getSelectedPlanAmount()) / 100).toFixed(2)}</span>.
         </p>
-
-        {/* <div>
-          <label htmlFor="customerName" className="block text-gray-700 font-bold">
-            Customer Name
-          </label>
-          <input
-            type="text"
-            id="customerName"
-            className="border p-2 rounded w-full"
-            placeholder="Enter your name"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            required
-          />
-        </div> */}
 
         <button
           onClick={handleCheckout}

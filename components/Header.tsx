@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export default function Header({ openModal, openLoginSignupModal }: HeaderProps) {
-  const { user, logout } = useContext(AppContext) ?? {};
+  const { user, logout, isSubscribed } = useContext(AppContext) ?? {};
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +22,7 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
       setIsMenuOpen(false);
     }
   };
-
+  debugger;
   useEffect(() => {
     // Only add the event listener when the menu is open
     if (isMenuOpen) {
@@ -77,6 +77,17 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
                 </div>
               )}
             </SlideDown>
+
+            {/* Button only visible when user is logged in */}
+            {
+              !isSubscribed &&
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded ml-4"
+                onClick={openModal}
+              >
+                Unlock 5000+ Answers
+              </button>
+            }
           </>
         ) : (
           <>
@@ -85,12 +96,6 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
               onClick={openLoginSignupModal}
             >
               Login
-            </button>
-            <button
-              className="bg-green-500 text-white px-4 py-2 rounded"
-              onClick={openModal}
-            >
-              Unlock 5000+ Answers
             </button>
           </>
         )}
