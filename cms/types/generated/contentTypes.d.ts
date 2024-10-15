@@ -639,6 +639,39 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiLoginHistoryLoginHistory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'login_histories';
+  info: {
+    singularName: 'login-history';
+    pluralName: 'login-histories';
+    displayName: 'LoginHistory';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    userId: Schema.Attribute.String;
+    email: Schema.Attribute.String;
+    loginTime: Schema.Attribute.DateTime;
+    logoutTime: Schema.Attribute.DateTime;
+    sessionDuration: Schema.Attribute.BigInteger;
+    sessionStatus: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::login-history.login-history'
+    >;
+  };
+}
+
 export interface ApiSubscriptionSubscription
   extends Struct.CollectionTypeSchema {
   collectionName: 'subscriptions';
@@ -1055,6 +1088,7 @@ declare module '@strapi/strapi' {
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
       'api::global.global': ApiGlobalGlobal;
+      'api::login-history.login-history': ApiLoginHistoryLoginHistory;
       'api::subscription.subscription': ApiSubscriptionSubscription;
       'admin::permission': AdminPermission;
       'admin::user': AdminUser;

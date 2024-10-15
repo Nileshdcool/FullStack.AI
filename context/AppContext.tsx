@@ -3,6 +3,8 @@ import 'firebase/compat/auth'; // Ensure you're using the correct Firebase auth
 import firebase from 'firebase/compat/app';
 import { getAuth, signOut, User } from "firebase/auth"; // Import signOut from Firebase
 import { getSubscriptionByUserId } from '@/services/stripeService';
+import { updateLogoutTime } from '@/services/loginHistory';
+import { clearSession } from '@/firebasedetails/firebaseAuth';
 
 interface AppContextProps {
     isSidebarCollapsed: boolean;
@@ -66,15 +68,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const setIsSubscribedFlag = async (flag: boolean): Promise<void> => {
         setIsSubscribed(flag); // Reset subscription status
     }
-
+    
+    const getSessionKey = (user: any) => {
+        return `session-${user?.uid}`; // Unique key based on user ID
+      };
     // Logout function that clears user data
     const logout = async () => {
+        debugger;
         const auth = getAuth(); // Get the Firebase auth instance
+        var loginHistoryId = localStorage.getItem("loginHistoryId"); 
+        const logoutTime = new Date().toISOString(); 
         try {
+            clearSession(user);
             await signOut(auth); // Sign out from Firebase
             setUser(null); // Clear user state in your app
             setIsSubscribed(false); // Clear subscription status on logout
-            window.location.href = "http://localhost:3000";
+            if (loginHistoryId) {
+                await updateLogoutTime(loginHistoryId, logoutTime); 
+                localStorage.removeItem("loginHistoryId");
+            }
+            const sessionKey = getSessionKey(user);
+            localStorage.removeItem(sessionKey);
+            window.location.href =   process.env.FRONTEND_URL || 'http://localhost:3000';
             console.log("User logged out from Firebase");
         } catch (error) {
             console.error("Error logging out:", error);

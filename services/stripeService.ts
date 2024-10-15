@@ -66,3 +66,14 @@ export const getSubscriptionByUserId = async (userEmail: string) => {
         throw error;
     }
 };
+
+export const getSubscriptionDetailsbyUserid = async (userEmail: string) => {
+    try {
+        const res = await httpRequest<{ results: any[] }>('/api/subscriptions?user=' + userEmail, {
+            method: HttpMethod.GET,
+        });
+        return res
+    } catch (error) {
+        throw error;
+    }
+};

@@ -22,7 +22,6 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
       setIsMenuOpen(false);
     }
   };
-  debugger;
   useEffect(() => {
     // Only add the event listener when the menu is open
     if (isMenuOpen) {

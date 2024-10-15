@@ -60,6 +60,7 @@ const stripeController = {
                         quantity: 1,                   // Quantity of the item
                     },
                 ],
+                customer_email: userEmail,    
                 success_url: `${baseUrl}/payments/successpage?session_id={CHECKOUT_SESSION_ID}`,
                 cancel_url: `${baseUrl}/payments/cancel`,
                 metadata: {
