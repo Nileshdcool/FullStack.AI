@@ -1,32 +1,29 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AppContext } from '@/context/AppContext';
 import { getSubscriptionDetailsbyUserid } from '@/services/stripeService';
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
-
 
 const ProfilePage: React.FC = () => {
   const { user } = useContext(AppContext); // Get logged-in user from context
-  const [billingHistory, setBillingHistory] = useState<any[]>([]);
+  const [billingHistory, setBillingHistory] = useState<BillingHistoryItem[]>([]); // Use the type for billing history
   const [lastLoginTime, setLastLoginTime] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch billing history only if user email is available
-    if (user?.email) {
+    if (user && user.email) {
       const fetchBillingHistory = async () => {
         try {
-          const response = await getSubscriptionDetailsbyUserid(user.email);
+          const response = await getSubscriptionDetailsbyUserid(user.email ?? "");
           setBillingHistory(response.results);
         } catch (error) {
           console.error('Error fetching billing history:', error);
         }
       };
+
       fetchBillingHistory();
+
       const lastSignInTime = user.metadata.lastSignInTime;
-      setLastLoginTime(lastSignInTime ?? null);  
-
-
+      setLastLoginTime(lastSignInTime ?? null);
     }
-  }, [user?.email]);
+  }, [user]);
 
   const calculateSubscriptionStatus = (endDate: string) => {
     const currentDate = new Date();
@@ -57,14 +54,14 @@ const ProfilePage: React.FC = () => {
           </ul>
         </div>
 
-      {/* Contact Information */}
-      <div className="mt-6">
+        {/* Last Login Information */}
+        <div className="mt-6">
           <h3 className="text-xl font-semibold">Last login</h3>
           {lastLoginTime ? (
-                <p>Last login: {new Date(lastLoginTime).toLocaleString()}</p>
-            ) : (
-                <p>Loading last login time...</p>
-            )}
+            <p>Last login: {new Date(lastLoginTime).toLocaleString()}</p>
+          ) : (
+            <p>Loading last login time...</p>
+          )}
         </div>
 
         {/* Billing History */}
@@ -101,7 +98,6 @@ const ProfilePage: React.FC = () => {
             </table>
           </div>
         </div>
-
       </div>
     </div>
   );
