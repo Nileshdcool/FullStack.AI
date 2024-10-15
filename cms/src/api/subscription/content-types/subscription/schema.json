@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "subscriptions",
+  "info": {
+    "singularName": "subscription",
+    "pluralName": "subscriptions",
+    "displayName": "Subscription"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+  "User": {
+    "type": "string"
+  },
+  "SubscriptionType": {
+    "type": "enumeration",
+    "enum": [
+      "lifetime",
+      "Days7",
+      "Days30"
+    ]
+  },
+  "StartDate": {
+    "type": "date"
+  },
+  "EndDate": {
+    "type": "date"
+  },
+  "StripePaymentID": {
+    "type": "string"
+  },
+  "StripeSubscriptionID": {
+    "type": "string"
+  },
+  "PaymentStatus": {
+    "type": "string"
+  }
+  }
+}

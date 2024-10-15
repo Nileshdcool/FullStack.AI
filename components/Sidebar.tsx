@@ -9,10 +9,10 @@ export default function Sidebar() {
     const isActive = (href: string) => router.pathname === href;
 
     // Access user from AppContext
-    const { isSidebarCollapsed, toggleSidebar, selectedIndustry, user } = useContext(AppContext) || {};
+    const { isSidebarCollapsed, toggleSidebar, selectedIndustry, user, isSubscribed } = useContext(AppContext) || {};
 
     // Check if user is logged in
-    const isUserLoggedIn = !!user;  // true if user is logged in, false otherwise
+    const isuserSubscribed = !!isSubscribed;  // true if user is logged in, false otherwise
 
     return (
         <aside className={`bg-gray-800 text-white p-4 transition-width duration-300 ${isSidebarCollapsed ? "w-16" : "w-64"}`}>
@@ -20,7 +20,7 @@ export default function Sidebar() {
                 {isSidebarCollapsed ? "Expand" : "Collapse"}
             </button>
             {/* Show user details only if the user is logged in */}
-            {!isSidebarCollapsed && isUserLoggedIn && (
+            {!isSidebarCollapsed && isuserSubscribed && (
                 <div className="mb-4 text-center">
                     <Avatar src={user?.photoURL || ''} size="50" round={true} alt="User Avatar" />
                     <h2 className="mt-2 text-lg font-bold">Welcome Back</h2>
@@ -31,7 +31,7 @@ export default function Sidebar() {
 
 
             {/* Disable menu if user is not logged in */}
-            <nav className={`${!isUserLoggedIn ? 'pointer-events-none opacity-50' : ''}`}>
+            <nav className={`${!isuserSubscribed ? 'pointer-events-none opacity-50' : ''}`}>
                 <ul>
                     <li>
                         <Link legacyBehavior href="/">
