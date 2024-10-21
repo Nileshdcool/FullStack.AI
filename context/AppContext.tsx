@@ -74,7 +74,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       };
     // Logout function that clears user data
     const logout = async () => {
-        debugger;
         const auth = getAuth(); // Get the Firebase auth instance
         var loginHistoryId = localStorage.getItem("loginHistoryId"); 
         const logoutTime = new Date().toISOString(); 

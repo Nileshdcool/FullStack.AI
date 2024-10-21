@@ -30,7 +30,6 @@ setPersistence(auth, browserLocalPersistence)
 
 const trackLoginHistory = async (user: any) => {
   try {
-    debugger;
 
     const loginData = {
       userId: user.uid,
@@ -54,7 +53,6 @@ const getSessionKey = (user: any) => {
 };
 
 const trackSession = async (user: any) => {
-  debugger;
   const sessionKey = getSessionKey(user);
   // Check if the session is already tracked in localStorage
   const isSessionTracked = localStorage.getItem(sessionKey);
@@ -82,7 +80,6 @@ export const clearSession = (user: any) => {
 
 // Listen for authentication state changes
  onAuthStateChanged(auth, async (user) => {
-  debugger;
   if (user) {
     await trackSession(user);
 

@@ -165,14 +165,14 @@ const stripeController = {
                 // Create the subscription entry in the Strapi database
                 await strapi.entityService.create('api::subscription.subscription', {
                     data: {
-                        User: customerEmail  ?? "unknown",             // Use the actual customer email from the event
-                        SubscriptionType: "Days7",       // You may want to map this based on actual event data
-                        StartDate: startDate,            // Actual subscription start date
-                        EndDate: endDate,                // Actual subscription end date
-                        StripePaymentID: stripePaymentId,   // Actual Stripe payment ID
-                        StripeSubscriptionID: stripeSubscriptionId, // Actual Stripe subscription ID
-                        PaymentStatus: "paid",  // Actual payment status from the event
-                        // status: 'active',  // Optionally mark the subscription as active
+                        User: customerEmail  ?? "unknown",            
+                        SubscriptionType: "Days7",       
+                        StartDate: startDate,            
+                        EndDate: endDate,              
+                        StripePaymentID: stripePaymentId,  
+                        StripeSubscriptionID: stripeSubscriptionId, 
+                        PaymentStatus: "paid",  
+                        // status: 'active', 
                         SubscriptionDetails: ctx.request.body
                     },
                 });

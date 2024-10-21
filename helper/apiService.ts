@@ -12,7 +12,6 @@ interface ApiOptions {
 }
 
 export const httpRequest = async <T>(endpoint: string, options: ApiOptions): Promise<T> => {
-    debugger;
     const { method, body, headers } = options;
     const fullUrl = `${BASE_URL}${endpoint}`;
     console.log("Making request to:", fullUrl); // Log full URL
