@@ -27,7 +27,7 @@ export default [
                 maxFileSize: 200 * 1024 * 1024, // Max file upload size
             },
             // Ensure raw body is available for the Stripe webhook route
-            onRouteMatch: (ctx) => ctx.path === '/stripe/webhook',
+            onRouteMatch: (ctx:any) => ctx.path === '/stripe/webhook',
         },
     },
     'strapi::session',

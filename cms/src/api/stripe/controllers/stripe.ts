@@ -45,7 +45,7 @@ const stripeController = {
         try {
             console.log("called createCheckoutSession");
 
-            console.log("ctx.request.body",ctx.request.body);
+            console.log("ctx.request.body", ctx.request.body);
             const { amount, userEmail, selectedPlanName } = ctx.request.body; // Get amount from the request body
             console.log(amount, userEmail, selectedPlanName);
 
@@ -59,7 +59,7 @@ const stripeController = {
                     user_email: userEmail,        // Pass user email if needed
                 },
             };
-    
+
             if (selectedPlanName === 'Lifetime') {
                 // Logic for lifetime subscription (one-time payment)
                 sessionData.mode = 'payment'; // Single payment (one-time)
@@ -77,10 +77,10 @@ const stripeController = {
                 ];
             } else {
                 // Logic for recurring subscription (7 days or 30 days)
-                const priceId = selectedPlanName === 'Days7' 
-                    ? process.env.STRIPE_PRICE_7DAYS 
+                const priceId = selectedPlanName === 'Days7'
+                    ? process.env.STRIPE_PRICE_7DAYS
                     : process.env.STRIPE_PRICE_20DAYS;
-                
+
                 sessionData.mode = 'subscription'; // Recurring subscription
                 sessionData.line_items = [
                     {
@@ -89,10 +89,10 @@ const stripeController = {
                     },
                 ];
             }
-    
+
             // Create the checkout session
             const session = await stripe.checkout.sessions.create(sessionData);
-    
+
             // Send the session object back to the client
             ctx.send(session);
         } catch (err) {
@@ -104,7 +104,7 @@ const stripeController = {
             }
         }
     },
-    
+
 
     // Verify the Stripe checkout session by session_id
     async verifySession(ctx: Context) {
@@ -121,34 +121,43 @@ const stripeController = {
                 ctx.throw(400, 'An unknown error occurred'); // Handle unexpected errors
             }
         }
-    },  
+    },
 
     async handleStripeWebhook(ctx: Context) {
         console.log("handleStripeWebhook called");
         const rawBody = ctx.request.body[Symbol.for('unparsedBody')];
         const sig = ctx.request.headers['stripe-signature']; // Get the signature from the headers
+
+        if (!sig) {
+            throw new Error('Missing Stripe signature header');
+        }
+
+        const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+        if (!webhookSecret) {
+            throw new Error('Missing Stripe Webhook Secret');
+        }
+
         try {
-            // Verify the event by constructing it with the raw body and signature
             const event = stripe.webhooks.constructEvent(
-                rawBody, // Use the request body
-                sig,
-                process.env.STRIPE_WEBHOOK_SECRET // Your webhook secret
+                rawBody, 
+                sig as string, 
+                webhookSecret 
             );
-    
-            // Handle the event based on its type
+
             if (event.type === 'invoice.payment_succeeded') {
                 const invoice = event.data.object;
                 console.log("event.data.object", event.data.object);
-                const customerEmail = invoice.customer_email ;
-    
-                const stripePaymentId = typeof invoice.payment_intent === 'string' 
-                    ? invoice.payment_intent 
+                const customerEmail = invoice.customer_email;
+
+                const stripePaymentId = typeof invoice.payment_intent === 'string'
+                    ? invoice.payment_intent
                     : invoice.payment_intent?.id;
-    
-                const stripeSubscriptionId = typeof invoice.subscription === 'string' 
-                    ? invoice.subscription 
+
+                const stripeSubscriptionId = typeof invoice.subscription === 'string'
+                    ? invoice.subscription
                     : invoice.subscription?.id;
-    
+
                 const subscriptionStatus = invoice.status;
                 const startDate = new Date(invoice.period_start * 1000).toISOString().split('T')[0]; // Convert UNIX timestamp to date
                 const endDate = new Date(invoice.period_end * 1000).toISOString().split('T')[0];     // Convert UNIX timestamp to date
@@ -156,31 +165,31 @@ const stripeController = {
                 // Create the subscription entry in the Strapi database
                 await strapi.entityService.create('api::subscription.subscription', {
                     data: {
-                        User: customerEmail,             // Use the actual customer email from the event
+                        User: customerEmail  ?? "unknown",             // Use the actual customer email from the event
                         SubscriptionType: "Days7",       // You may want to map this based on actual event data
                         StartDate: startDate,            // Actual subscription start date
                         EndDate: endDate,                // Actual subscription end date
                         StripePaymentID: stripePaymentId,   // Actual Stripe payment ID
                         StripeSubscriptionID: stripeSubscriptionId, // Actual Stripe subscription ID
-                        PaymentStatus: subscriptionStatus,  // Actual payment status from the event
+                        PaymentStatus: "paid",  // Actual payment status from the event
                         // status: 'active',  // Optionally mark the subscription as active
-                        SubscriptionDetails:ctx.request.body
+                        SubscriptionDetails: ctx.request.body
                     },
                 });
-    
+
                 console.log("Subscription data inserted successfully.");
             } else {
                 console.log(`Unhandled event type: ${event.type}`);
             }
-    
+
             ctx.body = { received: true };
-        } catch (err) {
+        } catch (err:any) {
             console.error('Error processing webhook:', err);
             ctx.throw(400, `Webhook Error: ${err.message}`);
         }
     }
-    
-    
+
+
 };
 
 export default stripeController;
