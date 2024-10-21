@@ -8,6 +8,7 @@ interface Env {
 
 export default ({ env }: { env: Env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite') as 'mysql' | 'postgres' | 'sqlite';
+  console.log('Database file path:', path.join(__dirname, '..', '..', env('DATABASE_FILENAME', '.tmp/data.db')));
 
   const connections = {
     mysql: {

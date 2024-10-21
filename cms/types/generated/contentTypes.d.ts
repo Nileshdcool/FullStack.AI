@@ -679,6 +679,7 @@ export interface ApiSubscriptionSubscription
     singularName: 'subscription';
     pluralName: 'subscriptions';
     displayName: 'Subscription';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -693,6 +694,7 @@ export interface ApiSubscriptionSubscription
     StripePaymentID: Schema.Attribute.String;
     StripeSubscriptionID: Schema.Attribute.String;
     PaymentStatus: Schema.Attribute.String;
+    SubscriptionDetails: Schema.Attribute.JSON;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;

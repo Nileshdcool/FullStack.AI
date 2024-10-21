@@ -1,3 +1,4 @@
+
 export default {
     routes: [
         {
@@ -22,6 +23,15 @@ export default {
             method: 'GET',
             path: '/stripe/verify-session/:session_id',
             handler: 'stripe.verifySession',
+            config: {
+                policies: [],
+                middlewares: [],
+            },
+        },
+        {
+            method: 'POST',
+            path: '/stripe/webhook',
+            handler: 'stripe.handleStripeWebhook',
             config: {
                 policies: [],
                 middlewares: [],

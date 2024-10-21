@@ -11,7 +11,6 @@ export const    addLoginHistory = async (loginData: {
     sessionStatus: string;               // Description of the device used
 }): Promise<any> => {
     try {
-        debugger;
         const res = await httpRequest<any>('/api/login-histories', {
             method: HttpMethod.POST,
             body: { data: loginData },

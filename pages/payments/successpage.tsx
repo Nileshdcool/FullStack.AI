@@ -36,11 +36,13 @@ const SuccessPage = () => {
                         const endDate = calculateEndDate(subscriptionType);
                         const stripePaymentID = session.payment_intent;
 
+                        if(stripePaymentID !=null){
                         // Check if a subscription with this StripePaymentID already exists
                         const existingSubscription = await getSubscriptionByPaymentID(stripePaymentID);
 
                         // If no existing subscription, add a new one
                         if (!existingSubscription) {
+                            console.log("calculateEndDate",calculateEndDate(session.metadata.plan_name));
                             const subscriptionData = {
                                 User: userEmail, // Update with actual user data
                                 SubscriptionType: subscriptionType,
@@ -49,12 +51,14 @@ const SuccessPage = () => {
                                 StripePaymentID: stripePaymentID,
                                 StripeSubscriptionID: session.id,
                                 PaymentStatus: session.payment_status,
+                                SubscriptionDetails:session
                             };
-
+                            console.log("subscriptionData", subscriptionData);
                             // Add the subscription record to Strapi
                             await addSubscription(subscriptionData);
                             setIsSubscribedFlag(true);
                         }
+                    }
 
                         setPaymentStatus('success');
                     } else {
