@@ -45,6 +45,11 @@ const stripeController = {
         try {
             console.log("called createCheckoutSession");
 
+            console.log("User from Firebase Middleware:", ctx.state.user); // Log the user
+            if (!ctx.state.user) {
+            return ctx.unauthorized('User not authenticated');
+            }
+
             console.log("ctx.request.body", ctx.request.body);
             const { amount, userEmail, selectedPlanName } = ctx.request.body; // Get amount from the request body
             console.log(amount, userEmail, selectedPlanName);

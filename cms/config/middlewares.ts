@@ -19,15 +19,14 @@ export default [
     {
         name: 'strapi::body',
         config: {
-            includeUnparsed: true,  // Include raw body for specific routes
-            patchKoa: true,         // Ensure the middleware works with Koa body
+            includeUnparsed: true,
+            patchKoa: true,
             formLimit: '56kb',
             jsonLimit: '1mb',
             formidable: {
-                maxFileSize: 200 * 1024 * 1024, // Max file upload size
+                maxFileSize: 200 * 1024 * 1024,
             },
-            // Ensure raw body is available for the Stripe webhook route
-            onRouteMatch: (ctx:any) => ctx.path === '/stripe/webhook',
+            onRouteMatch: (ctx: any) => ctx.path === '/stripe/webhook',
         },
     },
     'strapi::session',

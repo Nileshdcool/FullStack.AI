@@ -1,15 +1,15 @@
 import React, { useState, useContext } from 'react';
 import Modal from 'react-modal';
 import { FaFacebook, FaTwitter, FaGithub, FaGoogle, FaTimes } from 'react-icons/fa';
-import { signInWithEmailAndPassword, FacebookAuthProvider, TwitterAuthProvider, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, FacebookAuthProvider, TwitterAuthProvider, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/firebasedetails/firebaseAuth';
 import { AppContext } from '@/context/AppContext'; 
+import { toast } from 'react-toastify';
 
 // Set the app element for react-modal
 Modal.setAppElement('#__next');
 
 type SocialProvider = FacebookAuthProvider | GoogleAuthProvider | TwitterAuthProvider;
-
 
 interface LoginSignupModalProps {
   isModalOpen: boolean;
@@ -47,15 +47,35 @@ export default function LoginSignupModal({ isModalOpen, closeModal }: LoginSignu
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle login with email and password
+  // Handle login or signup with email and password
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      if (userCredential && setUser) setUser(userCredential.user);
-      closeModal();
-    } catch (error) {
-      console.error('Error logging in', error);
+      if (isLogin) {
+        const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        if (userCredential && setUser) {
+          setUser(userCredential.user); // Set the user context after successful login
+        }
+        closeModal();
+      } else {
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+          toast.info('User created successfully');
+          if (userCredential && setUser) {
+            setUser(userCredential.user); 
+          }
+          closeModal();
+        } catch (signUpError: any) {
+          if (signUpError.code === 'auth/email-already-in-use') {
+            toast.error('Email is already registered. Please log in instead.');
+          } else {
+            toast.error('Error during sign-up');
+          }
+        }
+      }
+    } catch (error:any) {
+      console.error(isLogin ? 'Error logging in' : 'Error signing up', error);
+      toast.error(isLogin ? 'Login failed. Please check your credentials.' : 'Sign-up failed. Please try again.');
     }
   };
   

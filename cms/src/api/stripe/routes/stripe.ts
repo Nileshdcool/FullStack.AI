@@ -1,3 +1,8 @@
+const commonConfig = {
+    policies: ['global::firebaseAuth'],
+    middlewares: [],
+    auth: false,
+};
 
 export default {
     routes: [
@@ -5,35 +10,26 @@ export default {
             method: 'POST',
             path: '/stripe/create-payment-intent',
             handler: 'stripe.createPaymentIntent',
-            config: {
-                policies: [],
-                middlewares: [],
-            },
+            config: commonConfig, // Apply common configuration
         },
         {
             method: 'POST',
             path: '/stripe/create-checkout-session',
             handler: 'stripe.createCheckoutSession',
-            config: {
-                policies: [],
-                middlewares: [],
-            },
+            config: commonConfig, // Apply common configuration
         },
         {
-            method: 'GET',
+            method: 'GET',  
             path: '/stripe/verify-session/:session_id',
             handler: 'stripe.verifySession',
-            config: {
-                policies: [],
-                middlewares: [],
-            },
+            config: commonConfig, // Apply common configuration
         },
         {
             method: 'POST',
             path: '/stripe/webhook',
             handler: 'stripe.handleStripeWebhook',
             config: {
-                policies: [],
+                policies: [], // You can override or leave empty if not needed
                 middlewares: [],
             },
         },
