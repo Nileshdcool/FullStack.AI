@@ -16,6 +16,11 @@ interface LoginSignupModalProps {
   closeModal: () => void;
 }
 
+interface FirebaseError {
+  code: string;
+  message: string;
+}
+
 const customStyles = {
   content: {
     top: '50%',
@@ -38,23 +43,20 @@ export default function LoginSignupModal({ isModalOpen, closeModal }: LoginSignu
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { user, setUser, logout } = useContext(AppContext) ?? {};
 
-  // Toggle between login and signup
   const toggleMode = () => setIsLogin((prev) => !prev);
 
-  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle login or signup with email and password
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       if (isLogin) {
         const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
         if (userCredential && setUser) {
-          setUser(userCredential.user); // Set the user context after successful login
+          setUser(userCredential.user);
         }
         closeModal();
       } else {
@@ -65,29 +67,33 @@ export default function LoginSignupModal({ isModalOpen, closeModal }: LoginSignu
             setUser(userCredential.user); 
           }
           closeModal();
-        } catch (signUpError: any) {
-          if (signUpError.code === 'auth/email-already-in-use') {
+        } catch (signUpError: unknown) {
+          const error = signUpError as FirebaseError;
+          if (error.code === 'auth/email-already-in-use') {
             toast.error('Email is already registered. Please log in instead.');
           } else {
             toast.error('Error during sign-up');
           }
         }
       }
-    } catch (error:any) {
-      console.error(isLogin ? 'Error logging in' : 'Error signing up', error);
+    } catch (error: unknown) {
+      const firebaseError = error as FirebaseError;
+      console.error(isLogin ? 'Error logging in' : 'Error signing up', firebaseError);
       toast.error(isLogin ? 'Login failed. Please check your credentials.' : 'Sign-up failed. Please try again.');
     }
   };
-  
-  // Handle third-party authentication (Facebook, Twitter, Google, Github)
+
   const socialLogin = async (provider: SocialProvider) => {
     try {
       closeModal();
       const userCredential = await signInWithPopup(auth, provider);
       console.log(userCredential.user);
-      if (userCredential) setUser(userCredential.user);
-    } catch (error) {
-      console.error(`Error logging in with ${provider.providerId}:`, error);
+      if (userCredential && setUser) {
+        setUser(userCredential.user);
+      }
+    } catch (error: unknown) {
+      const firebaseError = error as FirebaseError;
+      console.error(`Error logging in with ${provider.providerId}:`, firebaseError);
     }
   };
 

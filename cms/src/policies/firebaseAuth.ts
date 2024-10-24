@@ -1,7 +1,7 @@
 import { Context } from 'koa';
 import admin from '../../config/firebaseAdmin';
 
-export default async (ctx: Context, config: any, { strapi }) => {
+export default async (ctx: Context, _config: any) => {
     const authHeader = ctx.request.headers.authorization;
 
     if (!authHeader) {
