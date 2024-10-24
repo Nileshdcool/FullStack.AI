@@ -1,7 +1,14 @@
 import path from 'path';
 
-export default ({ env }) => {
-  const client = env('DATABASE_CLIENT', 'sqlite');
+interface Env {
+  (key: string, defaultValue?: string): string;
+  int: (key: string, defaultValue: number) => number;
+  bool: (key: string, defaultValue: boolean) => boolean;
+}
+
+export default ({ env }: { env: Env }) => {
+  const client = env('DATABASE_CLIENT', 'sqlite') as 'mysql' | 'postgres' | 'sqlite';
+  console.log('Database file path:', path.join(__dirname, '..', '..', env('DATABASE_FILENAME', '.tmp/data.db')));
 
   const connections = {
     mysql: {
@@ -53,7 +60,7 @@ export default ({ env }) => {
   return {
     connection: {
       client,
-      ...connections[client],
+      ...connections[client], // Now TypeScript knows that client is a valid key
       acquireConnectionTimeout: env.int('DATABASE_CONNECTION_TIMEOUT', 60000),
     },
   };
