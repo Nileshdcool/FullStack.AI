@@ -639,6 +639,77 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiLoginHistoryLoginHistory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'login_histories';
+  info: {
+    singularName: 'login-history';
+    pluralName: 'login-histories';
+    displayName: 'LoginHistory';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    userId: Schema.Attribute.String;
+    email: Schema.Attribute.String;
+    loginTime: Schema.Attribute.DateTime;
+    logoutTime: Schema.Attribute.DateTime;
+    sessionDuration: Schema.Attribute.BigInteger;
+    sessionStatus: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::login-history.login-history'
+    >;
+  };
+}
+
+export interface ApiSubscriptionSubscription
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'subscriptions';
+  info: {
+    singularName: 'subscription';
+    pluralName: 'subscriptions';
+    displayName: 'Subscription';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    User: Schema.Attribute.String;
+    SubscriptionType: Schema.Attribute.Enumeration<
+      ['lifetime', 'Days7', 'Days30']
+    >;
+    StartDate: Schema.Attribute.Date;
+    EndDate: Schema.Attribute.Date;
+    StripePaymentID: Schema.Attribute.String;
+    StripeSubscriptionID: Schema.Attribute.String;
+    PaymentStatus: Schema.Attribute.String;
+    SubscriptionDetails: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::subscription.subscription'
+    >;
+  };
+}
+
 export interface AdminPermission extends Struct.CollectionTypeSchema {
   collectionName: 'admin_permissions';
   info: {
@@ -1019,6 +1090,8 @@ declare module '@strapi/strapi' {
       'api::author.author': ApiAuthorAuthor;
       'api::category.category': ApiCategoryCategory;
       'api::global.global': ApiGlobalGlobal;
+      'api::login-history.login-history': ApiLoginHistoryLoginHistory;
+      'api::subscription.subscription': ApiSubscriptionSubscription;
       'admin::permission': AdminPermission;
       'admin::user': AdminUser;
       'admin::role': AdminRole;
