@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { addSubscription, verifySession, getSubscriptionByPaymentID } from '../../services/stripeService'; // Import the new function
 import { AppContext } from '@/context/AppContext'; // Import your context
+import Link from 'next/link';
 
 
 const SuccessPage = () => {
@@ -29,12 +30,12 @@ const SuccessPage = () => {
                 try {
                     // Call the verifySession function to verify the payment session
                     const session = await verifySession(session_id as string);
-
+debugger;
                     if (session.payment_status === 'paid') {
-                        const userEmail = session.metadata.user_email; // Extract user email
-                        const subscriptionType = session.metadata.plan_name; // Extract subscription type
+                        const userEmail = session.metadata.user_email; 
+                        const subscriptionType = session.metadata.plan_name; 
                         const endDate = calculateEndDate(subscriptionType);
-                        const stripePaymentID = session.payment_intent;
+                        const stripePaymentID = session.invoice;
 
                         if(stripePaymentID !=null){
                         // Check if a subscription with this StripePaymentID already exists
@@ -54,7 +55,6 @@ const SuccessPage = () => {
                                 SubscriptionDetails:session
                             };
                             console.log("subscriptionData", subscriptionData);
-                            // Add the subscription record to Strapi
                             await addSubscription(subscriptionData);
                             setIsSubscribedFlag(true);
                         }
@@ -80,6 +80,11 @@ const SuccessPage = () => {
                     <>
                         <h1 className="text-3xl font-bold text-green-500 mb-4">Payment Successful!</h1>
                         <p className="text-gray-600 text-lg">Thank you for your subscription! You can now access premium features.</p>
+                        <Link legacyBehavior href="/">
+                        <a className="mt-6 px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+                         Go back home
+                        </a>
+                        </Link>
                     </>
                 ) : paymentStatus === 'failed' ? (
                     <>
