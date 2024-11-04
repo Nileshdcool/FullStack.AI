@@ -95,8 +95,6 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
 
   return (
     <div>
-      <h1>Interview Questions</h1>
-
       <IndustryButtonToggle
         industries={industries}
         selectedIndustry={selectedIndustry}
