@@ -46,7 +46,7 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
       const defaultIndustry = initialIndustries[0];
       handleIndustryChange(defaultIndustry.Name);
     }
-  }, [initialIndustries, handleIndustryChange]);
+  }, [initialIndustries]);
 
   // Update sections and load first section, topic, and questions when industry changes
   useEffect(() => {
@@ -66,6 +66,7 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
           setSelectedTopic(firstTopic.id);
           setSelectedBadge(firstTopic.Name);
           fetchQuestions(firstTopic.id);
+          initialIndustries = [];
         } else {
           setSelectedTopic(null);
           setQuestions([]);
