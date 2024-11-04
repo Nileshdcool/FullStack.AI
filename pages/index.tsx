@@ -31,14 +31,73 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
   const { handleIndustryChange, selectedIndustry } = useContext(AppContext);
   const [industries, setIndustries] = useState<Industry[]>(initialIndustries);
-  const [sections, setSections] = useState<Section[]>(initialIndustries[0]?.sections || []);
+  const [sections, setSections] = useState<Section[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<string>(initialIndustries[0]?.sections[0]?.Name || '');
+  const [activeTab, setActiveTab] = useState<string>('');
 
+  // Load default industry, section, topic on initial load
+  useEffect(() => {
+    debugger;
+    if (initialIndustries.length > 0) {
+      const defaultIndustry = initialIndustries[0];
+      handleIndustryChange(defaultIndustry.Name);
+    }
+  }, [initialIndustries, handleIndustryChange]);
+
+  // Update sections and load first section, topic, and questions when industry changes
+  useEffect(() => {
+    debugger;
+    const selectedIndustryData = industries.find(ind => ind.Name === selectedIndustry);
+    if (selectedIndustryData) {
+      setSections(selectedIndustryData.sections);
+
+      if (selectedIndustryData.sections.length > 0) {
+        const firstSection = selectedIndustryData.sections[0];
+        setSelectedSection(firstSection.id);
+        setTopics(firstSection.topics);
+
+        // Load questions for the first topic in the first section
+        if (firstSection.topics.length > 0) {
+          const firstTopic = firstSection.topics[0];
+          setSelectedTopic(firstTopic.id);
+          setSelectedBadge(firstTopic.Name);
+          fetchQuestions(firstTopic.id);
+        } else {
+          setSelectedTopic(null);
+          setQuestions([]);
+        }
+      } else {
+        setSelectedSection(null);
+        setTopics([]);
+        setQuestions([]);
+      }
+    }
+  }, [selectedIndustry, industries]);
+
+  // Load topics and first topic questions when section changes
+  useEffect(() => {
+   debugger;
+    const selectedSectionData = sections.find(sec => sec.id === selectedSection);
+    if (selectedSectionData) {
+      setTopics(selectedSectionData.topics);
+
+      if (selectedSectionData.topics.length > 0) {
+        const firstTopic = selectedSectionData.topics[0];
+        setSelectedTopic(firstTopic.id);
+        setSelectedBadge(firstTopic.Name);
+        fetchQuestions(firstTopic.id);
+      } else {
+        setSelectedTopic(null);
+        setQuestions([]);
+      }
+    }
+  }, [selectedSection, sections]);
+
+  // Fetch questions by topic ID
   const fetchQuestions = async (topicId: number) => {
     try {
       const response = await getQuestionsByTopic(topicId);
@@ -48,53 +107,20 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
     }
   };
 
-  useEffect(() => {
-    // Load default selections on first load
-    if (initialIndustries.length > 0) {
-      const defaultIndustry = initialIndustries[0];
-      const defaultSection = defaultIndustry.sections[0];
-      const defaultTopic = defaultSection?.topics[0];
-
-      handleIndustryChange(defaultIndustry.Name); // Set the selected industry
-      setSections(defaultIndustry.sections);
-      setActiveTab(defaultSection.Name);
-      setSelectedSection(defaultSection.id);
-      setTopics(defaultSection.topics);
-
-      if (defaultTopic) {
-        setSelectedTopic(defaultTopic.id);
-        setSelectedBadge(defaultTopic.Name);
-        fetchQuestions(defaultTopic.id); // Fetch questions for the default topic
-      }
-    }
-  }, [initialIndustries, handleIndustryChange]);
-
+  // Handle section change and load questions for its first topic
   const handleSectionChange = (section: Section) => {
     setSelectedSection(section.id);
-    setSelectedTopic(null);
-    setTopics(section.topics);
     setActiveTab(section.Name);
   };
 
+  // Wrapper to handle industry change
   const handleIndustryChangeWrapper = (industryId: string) => {
     handleIndustryChange(industryId);
-    const selectedIndustryData = industries.find(industry => industry.Name.toString() === industryId);
-    if (selectedIndustryData) {
-      setSections(selectedIndustryData.sections);
-      if (selectedIndustryData.sections.length > 0) {
-        const firstSection = selectedIndustryData.sections[0];
-        setSelectedSection(firstSection.id);
-        setTopics(firstSection.topics);
-        setActiveTab(firstSection.Name);
-      } else {
-        setSelectedSection(null);
-        setTopics([]);
-      }
-    }
   };
 
   return (
     <div>
+
       <IndustryButtonToggle
         industries={industries}
         selectedIndustry={selectedIndustry}
@@ -142,6 +168,7 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
 };
 
 export default Home;
+
 
 
 import { GetStaticProps } from 'next';
