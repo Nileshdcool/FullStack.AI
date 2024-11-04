@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
 import { getIndustrySectionTopicData, getQuestionsByTopic } from '@/services/Domain';
 import { AppContext } from '@/context/AppContext';
 import { IndustryButtonToggle } from '@/components/IndustryToggle';
@@ -8,7 +7,7 @@ import { QuestionAnswerContent } from '@/components/features/SectionContent';
 interface Topic {
   id: number;
   documentId: string;
-  Name: string; // Corrected the property name to match the fetched data
+  Name: string;
 }
 
 interface Section {
@@ -25,81 +24,58 @@ interface Industry {
   sections: Section[];
 }
 
-const Home: React.FC = () => {
+interface HomeProps {
+  initialIndustries: Industry[];
+}
+
+const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
   const { handleIndustryChange, selectedIndustry } = useContext(AppContext);
-  const [industries, setIndustries] = useState<Industry[]>([]);
-  const [sections, setSections] = useState<Section[]>([]);
+  const [industries, setIndustries] = useState<Industry[]>(initialIndustries);
+  const [sections, setSections] = useState<Section[]>(initialIndustries[0]?.sections || []);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<string>(''); // State for active tab
-  const [selectedBadge, setSelectedBadge] = useState<string | null>(null); // State for selected badge
+  const [activeTab, setActiveTab] = useState<string>(initialIndustries[0]?.sections[0]?.Name || '');
 
-  // Fetch industries, sections, and topics from the API
-  const fetchIndustriesSectionsTopics = async () => {
-    try {
-      const response = await getIndustrySectionTopicData();
-      const industryData: Industry[] = response;
-      setIndustries(industryData);
-
-      // Automatically select the first industry if available
-      if (industryData.length > 0) {
-        const firstIndustry = industryData[0];
-        handleIndustryChange(firstIndustry.id.toString());
-        setSections(firstIndustry.sections);
-
-        if (firstIndustry.sections.length > 0) {
-          const firstSection = firstIndustry.sections[0];
-          setSelectedSection(firstSection.id);
-          setTopics(firstSection.topics);
-          setActiveTab(firstSection.Name); // Set the first section as active tab
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching industries, sections, and topics', error);
-    }
-  };
-
-  // Fetch questions based on the selected topic
   const fetchQuestions = async (topicId: number) => {
-    debugger;
     try {
-      const response = await getQuestionsByTopic(topicId); 
-      setQuestions(response.questions); // Assuming your API response has a `questions` property
+      const response = await getQuestionsByTopic(topicId);
+      setQuestions(response.questions);
     } catch (error) {
       console.error('Error fetching questions', error);
     }
   };
 
-
   useEffect(() => {
-    fetchIndustriesSectionsTopics();
-  }, []);
+    // Load default selections on first load
+    if (initialIndustries.length > 0) {
+      const defaultIndustry = initialIndustries[0];
+      const defaultSection = defaultIndustry.sections[0];
+      const defaultTopic = defaultSection?.topics[0];
 
-  // Fetch questions when the selected topic changes
-  useEffect(() => {
-    if (selectedTopic) {
-      debugger;
-      fetchQuestions(selectedTopic);
+      handleIndustryChange(defaultIndustry.Name); // Set the selected industry
+      setSections(defaultIndustry.sections);
+      setActiveTab(defaultSection.Name);
+      setSelectedSection(defaultSection.id);
+      setTopics(defaultSection.topics);
+
+      if (defaultTopic) {
+        setSelectedTopic(defaultTopic.id);
+        setSelectedBadge(defaultTopic.Name);
+        fetchQuestions(defaultTopic.id); // Fetch questions for the default topic
+      }
     }
-  }, [selectedTopic]);
+  }, [initialIndustries, handleIndustryChange]);
 
-  // Handle section changes
   const handleSectionChange = (section: Section) => {
-    debugger;
     setSelectedSection(section.id);
     setSelectedTopic(null);
     setTopics(section.topics);
-    setActiveTab(section.Name); // Set active tab to the selected section
+    setActiveTab(section.Name);
   };
 
-  // Handle topic changes
-  const handleTopicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedTopic(Number(e.target.value));
-  };
-
-  // Handle industry change
   const handleIndustryChangeWrapper = (industryId: string) => {
     handleIndustryChange(industryId);
     const selectedIndustryData = industries.find(industry => industry.Name.toString() === industryId);
@@ -117,9 +93,6 @@ const Home: React.FC = () => {
     }
   };
 
-  // Filter questions based on the selected section (you can customize the filtering logic)
-  const filteredQaList = questions.filter(question => question.sectionId === selectedSection);
-
   return (
     <div>
       <h1>Interview Questions</h1>
@@ -130,7 +103,6 @@ const Home: React.FC = () => {
         onChange={handleIndustryChangeWrapper}
       />
 
-      {/* Button Group for Sections (Tabs) */}
       <div className="flex justify-center mb-4">
         {sections.map((section) => (
           <button
@@ -151,7 +123,11 @@ const Home: React.FC = () => {
               <span
                 key={topic.id}
                 className={`bg-blue-200 text-blue-800 px-2 py-1 m-1 rounded-full cursor-pointer hover:bg-blue-300 ${selectedBadge === topic.Name ? 'bg-blue-400' : ''}`}
-                onClick={() => setSelectedTopic(topic.id)}
+                onClick={() => {
+                  setSelectedTopic(topic.id);
+                  setSelectedBadge(topic.Name);
+                  fetchQuestions(topic.id); // Fetch questions when a new topic is selected
+                }}
               >
                 {topic.Name}
               </span>
@@ -160,23 +136,33 @@ const Home: React.FC = () => {
         </div>
       )}
 
-      {/* {selectedTopic && (
-        <div>
-          <h2>Questions for Topic ID: {selectedTopic}</h2>
-          <ul>
-            {questions.map((question) => (
-              <li key={question.id}>{question.text}</li>
-            ))}
-          </ul>
-        </div>
-      )} */}
-
       {selectedSection && (
         <QuestionAnswerContent selectedSection={selectedSection} filteredQaList={questions} />
       )}
-
     </div>
   );
 };
 
 export default Home;
+
+
+import { GetStaticProps } from 'next';
+
+export const getStaticProps: GetStaticProps = async () => {
+  try {
+    const initialIndustries = await getIndustrySectionTopicData();
+
+    return {
+      props: {
+        initialIndustries,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching industries:', error);
+    return {
+      props: {
+        initialIndustries: [],
+      },
+    };
+  }
+};

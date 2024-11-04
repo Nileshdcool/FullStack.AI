@@ -1,6 +1,6 @@
 import React from 'react';
+import { marked } from 'marked';
 
-// Define the order of levels
 const levelOrder: { [key: string]: number } = {
   Entry: 1,
   Junior: 2,
@@ -16,22 +16,21 @@ interface Answer {
 
 interface QuestionLevel {
   id: number;
-  level_name: string; // Include the level_name property
+  level_name: string;
 }
 
 interface Question {
   id: number;
-  Content: string; // Match your API's field name
+  Content: string;
   answers: Answer[];
-  question_level: QuestionLevel; // Change this to be of type QuestionLevel
+  question_level: QuestionLevel;
 }
 
 interface SectionContentProps {
   selectedSection: number;
-  filteredQaList: Question[]; // Update the type based on your API structure
+  filteredQaList: Question[];
 }
 
-// Function to sort questions by their level
 const sortQuestionsByLevel = (questions: Question[]) => {
   return questions.sort((a, b) => {
     const levelA = a.question_level.level_name;
@@ -41,15 +40,10 @@ const sortQuestionsByLevel = (questions: Question[]) => {
 };
 
 export function QuestionAnswerContent({ selectedSection, filteredQaList }: SectionContentProps) {
-  // Sort questions before rendering
   const sortedQuestions = sortQuestionsByLevel(filteredQaList);
 
   return (
     <div className="my-8 border border-gray-300 p-4">
-      {/* <h2 className="text-2xl font-bold mb-4">
-        Content for Section ID: {selectedSection}
-      </h2> */}
-
       {sortedQuestions.length > 0 && (
         <h3 className="text-xl mb-2">Top {sortedQuestions.length} Interview Questions</h3>
       )}
@@ -57,16 +51,19 @@ export function QuestionAnswerContent({ selectedSection, filteredQaList }: Secti
         {sortedQuestions.map((qa, index) => (
           <details key={qa.id} className="bg-gray-100 p-4 rounded shadow-md">
             <summary className="cursor-pointer font-semibold flex items-center justify-between">
-              {/* Display question number based on index */}
               <span className="text-lg text-gray-600">Q{index + 1}: {qa.Content}</span>
               <div className="flex items-center">
                 <span className="text-sm mr-2 px-2 py-1 rounded bg-orange-500 text-white">Add To PDF</span>
-                {/* Access level_name from question_level */}
                 <span className="mr-4 font-semibold text-blue-600">{qa.question_level.level_name}</span>
               </div>
             </summary>
-            {qa.answers.map(answer => (
-              <p key={answer.id} className="mt-2">{answer.content}</p>
+            {qa.answers.map((answer, answerIndex) => (
+              <div key={answer.id} className={`mt-2 p-3 rounded ${answerIndex % 2 === 0 ? 'bg-gray-200' : 'bg-gray-300'}`}>
+                {qa.answers.length > 1 && (
+                  <span className="font-semibold text-sm">Answer {answerIndex + 1}:</span>
+                )}
+                <p dangerouslySetInnerHTML={{ __html: marked(answer.content) }} className="ml-4 text-gray-700" />
+              </div>
             ))}
           </details>
         ))}
