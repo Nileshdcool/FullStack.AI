@@ -41,7 +41,6 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
 
   // Load default industry, section, topic on initial load
   useEffect(() => {
-    debugger;
     if (initialIndustries.length > 0) {
       const defaultIndustry = initialIndustries[0];
       handleIndustryChange(defaultIndustry.Name);
@@ -50,7 +49,6 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
 
   // Update sections and load first section, topic, and questions when industry changes
   useEffect(() => {
-    debugger;
     const selectedIndustryData = industries.find(ind => ind.Name === selectedIndustry);
     if (selectedIndustryData) {
       setSections(selectedIndustryData.sections);
@@ -81,7 +79,6 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
 
   // Load topics and first topic questions when section changes
   useEffect(() => {
-   debugger;
     const selectedSectionData = sections.find(sec => sec.id === selectedSection);
     if (selectedSectionData) {
       setTopics(selectedSectionData.topics);
