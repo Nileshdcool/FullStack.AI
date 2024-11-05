@@ -52,19 +52,19 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
     const selectedIndustryData = industries.find(ind => ind.Name === selectedIndustry);
     if (selectedIndustryData) {
       setSections(selectedIndustryData.sections);
-
+  
       if (selectedIndustryData.sections.length > 0) {
         const firstSection = selectedIndustryData.sections[0];
         setSelectedSection(firstSection.id);
+        setActiveTab(firstSection.Name); // Set the activeTab to the default section
         setTopics(firstSection.topics);
-
+  
         // Load questions for the first topic in the first section
         if (firstSection.topics.length > 0) {
           const firstTopic = firstSection.topics[0];
           setSelectedTopic(firstTopic.id);
           setSelectedBadge(firstTopic.Name);
           fetchQuestions(firstTopic.id);
-          initialIndustries = [];
         } else {
           setSelectedTopic(null);
           setQuestions([]);
@@ -76,7 +76,7 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
       }
     }
   }, [selectedIndustry, industries]);
-
+  
   // Load topics and first topic questions when section changes
   useEffect(() => {
     const selectedSectionData = sections.find(sec => sec.id === selectedSection);
