@@ -1,5 +1,3 @@
-// src/api/industry/controllers/industry.ts
-
 import { factories } from '@strapi/strapi';
 
 export default factories.createCoreController('api::industry.industry', ({ strapi }) => ({
@@ -14,7 +12,7 @@ export default factories.createCoreController('api::industry.industry', ({ strap
       });
       ctx.send(industries);
     } catch (error) {
-      ctx.throw(500, error);
+      ctx.throw(500, error instanceof Error ? error.message : String(error));
     }
   },
 }));

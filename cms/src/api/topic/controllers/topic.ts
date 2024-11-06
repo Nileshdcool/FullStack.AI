@@ -24,7 +24,7 @@ export default factories.createCoreController('api::topic.topic', ({ strapi }) =
 
       ctx.send(topicWithQuestions);
     } catch (error) {
-      ctx.throw(500, `Failed to fetch questions: ${error.message}`);
+      ctx.throw(500, `Failed to fetch questions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   },
 }));

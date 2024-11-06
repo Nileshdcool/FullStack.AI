@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import { marked } from 'marked';
 import { AppContext } from '@/context/AppContext';
+import { Question, SectionContentProps } from '@/interfaces/interviewmodels';
+
 
 const levelOrder: { [key: string]: number } = {
   Entry: 1,
@@ -10,28 +12,6 @@ const levelOrder: { [key: string]: number } = {
   Expert: 5,
 };
 
-interface Answer {
-  id: number;
-  content: string;
-}
-
-interface QuestionLevel {
-  id: number;
-  level_name: string;
-}
-
-interface Question {
-  id: number;
-  Content: string;
-  answers: Answer[];
-  question_level: QuestionLevel;
-}
-
-interface SectionContentProps {
-  selectedSection: number;
-  filteredQaList: Question[];
-}
-
 const sortQuestionsByLevel = (questions: Question[]) => {
   return questions.sort((a, b) => {
     const levelA = a.question_level.level_name;
@@ -40,7 +20,7 @@ const sortQuestionsByLevel = (questions: Question[]) => {
   });
 };
 
-export function QuestionAnswerContent({ selectedSection, filteredQaList }: SectionContentProps) {
+export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
   const { isSubscribed } = useContext(AppContext);
   const sortedQuestions = sortQuestionsByLevel(filteredQaList);
 
@@ -76,7 +56,7 @@ export function QuestionAnswerContent({ selectedSection, filteredQaList }: Secti
                 <input
                   type="checkbox"
                   className="ml-2"
-                  onChange={(e) => {
+                  onChange={() => {
                     // Handle Add to PDF action here
                   }}
                 />

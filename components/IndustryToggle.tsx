@@ -1,4 +1,3 @@
-import { useContext } from "react";
 
 interface Industry {
   id: number;

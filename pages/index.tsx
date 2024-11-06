@@ -3,49 +3,27 @@ import { getIndustrySectionTopicData, getQuestionsByTopic } from '@/services/Dom
 import { AppContext } from '@/context/AppContext';
 import { IndustryButtonToggle } from '@/components/IndustryToggle';
 import { QuestionAnswerContent } from '@/components/features/SectionContent';
-
-interface Topic {
-  id: number;
-  documentId: string;
-  Name: string;
-}
-
-interface Section {
-  id: number;
-  documentId: string;
-  Name: string;
-  topics: Topic[];
-}
-
-interface Industry {
-  id: number;
-  documentId: string;
-  Name: string;
-  sections: Section[];
-}
-
-interface HomeProps {
-  initialIndustries: Industry[];
-}
+import { HomeProps, Industry, Question, Section, Topic } from '@/interfaces/interviewmodels';
 
 const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
   const { handleIndustryChange, selectedIndustry } = useContext(AppContext);
-  const [industries, setIndustries] = useState<Industry[]>(initialIndustries);
+  const [industries] = useState<Industry[]>(initialIndustries);
   const [sections, setSections] = useState<Section[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
-  const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
+  const [, setSelectedTopic] = useState<number | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
 
   // Load default industry, section, topic on initial load
   useEffect(() => {
     if (initialIndustries.length > 0) {
-      const defaultIndustry = initialIndustries[0];
-      handleIndustryChange(defaultIndustry.Name);
+        const defaultIndustry = initialIndustries[0];
+        handleIndustryChange(defaultIndustry.Name);
     }
-  }, [initialIndustries]);
+}, [initialIndustries]);
+
 
   // Update sections and load first section, topic, and questions when industry changes
   useEffect(() => {
