@@ -41,7 +41,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (user) {
                 setUser(user); // Set user if logged in
-
+                
                 // Fetch subscription status for the logged-in user
                 const userEmail = user.email; // Get user email
                 if (userEmail) {
@@ -69,9 +69,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setIsSubscribed(flag); // Reset subscription status
     }
     
-    const getSessionKey = (user: any) => {
-        return `session-${user?.uid}`; // Unique key based on user ID
-      };
+    const getSessionKey = (user: User | null) => {
+        return `session-${user?.uid}`;
+    };
+    
     // Logout function that clears user data
     const logout = async () => {
         const auth = getAuth(); // Get the Firebase auth instance

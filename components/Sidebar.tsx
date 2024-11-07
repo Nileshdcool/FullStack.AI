@@ -40,7 +40,7 @@ export default function Sidebar() {
                     </li>
 
                     {/* Conditional rendering based on industry */}
-                    {selectedIndustry === "IT" && (
+                    {selectedIndustry === "Technology" && (
                         <>
                             <li>
                                 <details>
