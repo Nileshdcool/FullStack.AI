@@ -22,19 +22,15 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
       setIsMenuOpen(false);
     }
   };
-  useEffect(() => {
-    // Only add the event listener when the menu is open
-    if (isMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
 
-    // Cleanup event listener on component unmount
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isMenuOpen]);
+  }, []);
+
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <header className="bg-gray-900 text-white p-4 flex items-center justify-between">
@@ -53,40 +49,42 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
               onClick={toggleMenu}
               style={{ cursor: 'pointer' }}
             />
-            <SlideDown>
-              {isMenuOpen && (
-                <div className="menu absolute bg-white shadow-lg rounded p-4" ref={menuRef}>
+            {isMenuOpen && (
+              <SlideDown>
+                <div
+                  className="menu absolute bg-white shadow-lg rounded p-4"
+                  ref={menuRef}
+                  style={{ position: 'absolute', top: '50px', right: '0' }}
+                >
                   <ul className="space-y-2">
                     <li>
-                      <Link href="/profile" className="block text-gray-700 hover:text-gray-900">
+                      <Link href="/profile" className="block text-gray-700 hover:text-gray-900" onClick={closeMenu}>
                         Profile
                       </Link>
                     </li>
                     <li>
-                      <Link href="/settings" className="block text-gray-700 hover:text-gray-900">
+                      <Link href="/settings" className="block text-gray-700 hover:text-gray-900" onClick={closeMenu}>
                         Settings
                       </Link>
                     </li>
                     <li>
-                      <button onClick={logout} className="w-full text-left text-gray-700 hover:text-gray-900">
+                      <button onClick={() => { logout(); closeMenu(); }} className="w-full text-left text-gray-700 hover:text-gray-900">
                         Logout
                       </button>
                     </li>
                   </ul>
                 </div>
-              )}
-            </SlideDown>
+              </SlideDown>
+            )}
 
-            {/* Button only visible when user is logged in */}
-            {
-              !isSubscribed &&
+            {!isSubscribed && (
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded ml-4"
                 onClick={openModal}
               >
                 Unlock 5000+ Answers
               </button>
-            }
+            )}
           </>
         ) : (
           <>
@@ -96,7 +94,15 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
             >
               Login
             </button>
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded ml-4"
+              onClick={openModal}
+            >
+              Unlock 5000+ Answers
+            </button>
           </>
+
+
         )}
       </div>
     </header>

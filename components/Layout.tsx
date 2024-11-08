@@ -27,8 +27,12 @@ export default function Layout({ children }: LayoutProps) {
                 <Header openModal={openModal} openLoginSignupModal={openLoginSignupModal} />
                 <main className="flex-1 p-4">{children}</main>
                 <Footer />
-            </div>
-            <SubscriptionModal isModalOpen={isModalOpen} closeModal={closeModal} />
+            </div>  
+            <SubscriptionModal
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                openLoginSignupModal={openLoginSignupModal} // Pass this prop to SubscriptionModal
+            />
             <LoginSignupModal 
                 isModalOpen={isLoginSignupModalOpen} 
                 closeModal={closeLoginSignupModal}                 

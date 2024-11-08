@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { marked } from 'marked';
 import { AppContext } from '@/context/AppContext';
 import { Question, SectionContentProps } from '@/interfaces/interviewmodels';
-
+import { FaLock } from 'react-icons/fa'; // Import lock icon from react-icons
 
 const levelOrder: { [key: string]: number } = {
   Entry: 1,
@@ -31,10 +31,21 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
       )}
       <div className="space-y-4">
         {sortedQuestions.map((qa, index) => (
-          <details key={qa.id} className="bg-gray-100 p-4 rounded shadow-md">
+          <details
+            key={qa.id}
+            className={`bg-gray-100 p-4 rounded shadow-md ${
+              (!isSubscribed && index > 0) ? 'pointer-events-none' : '' // Disable interaction for locked questions
+            }`}
+            open={isSubscribed || index === 0} // Only open the first question or if subscribed
+          >
             <summary className="cursor-pointer font-semibold flex items-center justify-between">
-              <span className="text-lg text-gray-600">Q{index + 1}: {qa.Content}</span>
+              <span className="text-lg text-gray-600">
+                Q{index + 1}: {qa.Content}
+              </span>
               <div className="flex items-center">
+                {(!isSubscribed && index > 0) && ( // Show lock icon if not subscribed and not the first question
+                  <FaLock className="text-gray-500 mr-2" title="Subscribe to unlock" />
+                )}
                 <span className="text-sm mr-2 px-2 py-1 rounded bg-orange-500 text-white">Add To PDF</span>
                 <span
                   className={`text-sm mr-2 px-2 py-1 rounded ${
@@ -62,8 +73,8 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
                 />
               </div>
             </summary>
-            {/* Display all answers if it's the first question or if the user is subscribed */}
-            {(index === 0 || isSubscribed) ? (
+            {/* Display answers only for the first question or if subscribed */}
+            {(index === 0 || isSubscribed) && (
               qa.answers.map((answer, answerIndex) => (
                 <div
                   key={answer.id}
@@ -74,14 +85,12 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
                   {qa.answers.length > 1 && (
                     <span className="font-semibold text-sm">Answer {answerIndex + 1}:</span>
                   )}
-                  <p dangerouslySetInnerHTML={{ __html: marked(answer.content) }} className="ml-4 text-gray-700" />
+                  <p
+                    dangerouslySetInnerHTML={{ __html: marked(answer.content) }}
+                    className="ml-4 text-gray-700"
+                  />
                 </div>
               ))
-            ) : (
-              /* Show a subscription prompt for locked answers */
-              <p className="text-sm italic text-gray-500 mt-2">
-                Subscribe to read more answers
-              </p>
             )}
           </details>
         ))}

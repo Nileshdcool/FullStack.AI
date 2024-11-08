@@ -61,7 +61,10 @@ export const getSubscriptionByUserId = async (userEmail: string) => {
         const res = await httpRequest<{ results: any[] }>('/api/subscriptions?user=' + userEmail, {
             method: HttpMethod.GET,
         });
-        return res.results.length > 0;
+        debugger;
+        if(new Date() > new Date(res.results[0].EndDate))
+            return false;
+        return true;
     } catch (error) {
         throw error;
     }
