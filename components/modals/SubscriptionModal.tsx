@@ -12,6 +12,7 @@ Modal.setAppElement('#__next');
 interface SubscriptionModalProps {
   isModalOpen: boolean;
   closeModal: () => void;
+  openLoginSignupModal: () => void; // Add this prop
   customStyles?: CSSProperties;
 }
 
@@ -36,6 +37,7 @@ const customStyles = {
 export default function SubscriptionModal({
   isModalOpen,
   closeModal,
+  openLoginSignupModal,
 }: SubscriptionModalProps) {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -59,7 +61,9 @@ export default function SubscriptionModal({
   const handleCheckout = async () => {
     try {
       if (!userEmail) {
-        toast.error('User is not logged in.');
+        // Close the subscription modal and open the login/signup modal
+        closeModal();
+        openLoginSignupModal();
         return;
       }
       setLoading(true);
