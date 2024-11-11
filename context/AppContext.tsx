@@ -7,7 +7,7 @@ import { updateLogoutTime } from '@/services/loginHistory';
 import { clearSession } from '@/firebasedetails/firebaseAuth';
 
 interface AppContextProps {
-    isSidebarCollapsed: boolean;
+    isSidebarCollapsed: boolean;    
     toggleSidebar: () => void;
     handleIndustryChange: (event: string) => void;
     selectedIndustry: string;

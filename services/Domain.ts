@@ -3,10 +3,13 @@
 import { httpRequest } from '@/helper/apiService';
 import { HttpMethod } from '@/helper/enums';
 
-export const getQuestionsByTopic = async (topicId: number) => {
+
+
+export const getQuestionsByTopic = async (topicId: number, isSubscribed:boolean ) => {
     try {
         const res = await httpRequest<{ questions: any[] }>(`/api/topics/${topicId}/questions`, {
             method: HttpMethod.GET,
+            isSubscribed,
         });
         return res;
     } catch (error) {

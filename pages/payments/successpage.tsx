@@ -30,7 +30,6 @@ const SuccessPage = () => {
                 try {
                     // Call the verifySession function to verify the payment session
                     const session = await verifySession(session_id as string);
-debugger;
                     if (session.payment_status === 'paid') {
                         const userEmail = session.metadata.user_email; 
                         const subscriptionType = session.metadata.plan_name; 

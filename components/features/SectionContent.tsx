@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { marked } from 'marked';
 import { AppContext } from '@/context/AppContext';
 import { Question, SectionContentProps } from '@/interfaces/interviewmodels';
-import { FaLock } from 'react-icons/fa'; // Import lock icon from react-icons
+import { FaLock } from 'react-icons/fa';
 
 const levelOrder: { [key: string]: number } = {
   Entry: 1,
@@ -22,7 +22,20 @@ const sortQuestionsByLevel = (questions: Question[]) => {
 
 export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
   const { isSubscribed } = useContext(AppContext);
+  const [openQuestions, setOpenQuestions] = useState<Set<number>>(new Set());
   const sortedQuestions = sortQuestionsByLevel(filteredQaList);
+
+  const toggleQuestion = (id: number) => {
+    setOpenQuestions(prevState => {
+      const newState = new Set(prevState);
+      if (newState.has(id)) {
+        newState.delete(id); // Close the question if it's already open
+      } else {
+        newState.add(id); // Open the question if it's closed
+      }
+      return newState;
+    });
+  };
 
   return (
     <div className="my-8 border border-gray-300 p-4">
@@ -31,19 +44,21 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
       )}
       <div className="space-y-4">
         {sortedQuestions.map((qa, index) => (
-          <details
+          <div
             key={qa.id}
             className={`bg-gray-100 p-4 rounded shadow-md ${
               (!isSubscribed && index > 0) ? 'pointer-events-none' : '' // Disable interaction for locked questions
             }`}
-            open={isSubscribed || index === 0} // Only open the first question or if subscribed
           >
-            <summary className="cursor-pointer font-semibold flex items-center justify-between">
+            <summary
+              className="cursor-pointer font-semibold flex items-center justify-between"
+              onClick={() => toggleQuestion(qa.id)}
+            >
               <span className="text-lg text-gray-600">
                 Q{index + 1}: {qa.Content}
               </span>
               <div className="flex items-center">
-                {(!isSubscribed && index > 0) && ( // Show lock icon if not subscribed and not the first question
+                {(!isSubscribed && index > 0) && (
                   <FaLock className="text-gray-500 mr-2" title="Subscribe to unlock" />
                 )}
                 <span className="text-sm mr-2 px-2 py-1 rounded bg-orange-500 text-white">Add To PDF</span>
@@ -73,8 +88,8 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
                 />
               </div>
             </summary>
-            {/* Display answers only for the first question or if subscribed */}
-            {(index === 0 || isSubscribed) && (
+            {/* Display answers only for questions that are in openQuestions */}
+            {openQuestions.has(qa.id) && (
               qa.answers.map((answer, answerIndex) => (
                 <div
                   key={answer.id}
@@ -92,7 +107,7 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
                 </div>
               ))
             )}
-          </details>
+          </div>
         ))}
       </div>
     </div>

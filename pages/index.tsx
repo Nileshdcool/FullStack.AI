@@ -15,6 +15,7 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
+  const { isSubscribed } = useContext(AppContext);
 
   // Load default industry, section, topic on initial load
   useEffect(() => {
@@ -76,7 +77,7 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
   // Fetch questions by topic ID
   const fetchQuestions = async (topicId: number) => {
     try {
-      const response = await getQuestionsByTopic(topicId);
+      const response = await getQuestionsByTopic(topicId,isSubscribed);
       setQuestions(response.questions);
     } catch (error) {
       console.error('Error fetching questions', error);
