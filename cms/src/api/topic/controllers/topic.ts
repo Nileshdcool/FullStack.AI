@@ -6,6 +6,8 @@ interface TopicWithQuestions {
     content: string;
     answers?: Array<{ id: number; content: string }>;
     question_level: { level_name: string };
+    readStatus?: boolean | null; // Updated to allow null
+    statusId?: string | null; // Add statusId field as optional
   }>;
 }
 
@@ -13,10 +15,12 @@ export default factories.createCoreController('api::topic.topic', ({ strapi }) =
   async getQuestionsByTopic(ctx) {
     const { id } = ctx.params;
     const isSubscribed = ctx.request.headers['x-user-subscribed'] === 'true';
-
+    const userEmail = Array.isArray(ctx.request.headers['x-user-email']) 
+      ? ctx.request.headers['x-user-email'][0] 
+      : ctx.request.headers['x-user-email'];
+    console.log("User Email:", userEmail);
 
     try {
-
       // Fetch topic with questions and respective answers
       const topicWithQuestions = (await strapi.entityService.findOne('api::topic.topic', id, {
         populate: {
@@ -29,12 +33,28 @@ export default factories.createCoreController('api::topic.topic', ({ strapi }) =
             },
           },
         },
-      })) as unknown as TopicWithQuestions; // First cast to 'unknown', then to 'TopicWithQuestions'
+      })) as unknown as TopicWithQuestions;
 
       // If topic is not found, return 404 error
       if (!topicWithQuestions) {
         return ctx.notFound('Topic not found');
       }
+
+      // Fetch question read statuses for the user based on question id and user email
+      const readStatuses = await strapi.entityService.findMany('api::question-read-status.question-read-status', {
+        filters: { UserEmail: userEmail },
+      });
+      console.log(readStatuses);
+
+      // Map read status to questions
+      topicWithQuestions.questions = topicWithQuestions.questions.map((question) => {
+        const readStatus = readStatuses.find((status) => status.QuestionId == String(question.id) && status.UserEmail === userEmail);
+        return {
+          ...question,
+          readStatus: readStatus ? readStatus.ReadStatus : false, // Set read status (false if not found)
+          statusId: readStatus ? readStatus.documentId : null, // Use null if readStatus is undefined
+        };
+      });
 
       // Modify questions based on subscription status
       if (!isSubscribed && topicWithQuestions.questions && topicWithQuestions.questions.length > 1) {

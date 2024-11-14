@@ -1,8 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { marked } from 'marked';
 import { AppContext } from '@/context/AppContext';
-import { Question, SectionContentProps } from '@/interfaces/interviewmodels';
+import { SectionContentProps } from '@/interfaces/interviewmodels';
 import { FaLock } from 'react-icons/fa';
+import { addQuestionReadStatus, updateQuestionReadStatus } from '@/services/questionReadStatus';
 
 const levelOrder: { [key: string]: number } = {
   Entry: 1,
@@ -12,7 +13,7 @@ const levelOrder: { [key: string]: number } = {
   Expert: 5,
 };
 
-const sortQuestionsByLevel = (questions: Question[]) => {
+const sortQuestionsByLevel = (questions: any[]) => {
   return questions.sort((a, b) => {
     const levelA = a.question_level.level_name;
     const levelB = b.question_level.level_name;
@@ -21,33 +22,101 @@ const sortQuestionsByLevel = (questions: Question[]) => {
 };
 
 export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
-  const { isSubscribed } = useContext(AppContext);
+  const { isSubscribed, user } = useContext(AppContext);
   const [openQuestions, setOpenQuestions] = useState<Set<number>>(new Set());
-  const sortedQuestions = sortQuestionsByLevel(filteredQaList);
+  const [readStatuses, setReadStatuses] = useState<{ [key: number]: boolean }>({});
+  const [statusIds, setStatusIds] = useState<{ [key: number]: string }>({});
 
+  // Initialize the read statuses based on the fetched questions and sort them by level
+  useEffect(() => {
+    const sortedQuestions = sortQuestionsByLevel(filteredQaList);
+
+    const initialReadStatuses: { [key: number]: boolean } = {};
+    const initialStatusIds: { [key: number]: string } = {};
+
+    sortedQuestions.forEach((qa) => {
+      initialReadStatuses[qa.id] = qa.readStatus;
+      initialStatusIds[qa.id] = qa.statusId;
+    });
+
+    setReadStatuses(initialReadStatuses);
+    setStatusIds(initialStatusIds);
+  }, [filteredQaList]);
+
+  // Calculate the progress of read questions
+  const calculateProgress = () => {
+    const totalQuestions = filteredQaList.length;
+    const readQuestions = Object.values(readStatuses).filter(status => status).length;
+    return totalQuestions > 0 ? (readQuestions / totalQuestions) * 100 : 0;
+  };
+
+  // Toggle answer visibility
   const toggleQuestion = (id: number) => {
-    setOpenQuestions(prevState => {
+    setOpenQuestions((prevState) => {
       const newState = new Set(prevState);
       if (newState.has(id)) {
-        newState.delete(id); // Close the question if it's already open
+        newState.delete(id);
       } else {
-        newState.add(id); // Open the question if it's closed
+        newState.add(id);
       }
       return newState;
     });
   };
 
+  // Handle checkbox change for read status
+  const handleCheckboxChange = async (e: React.ChangeEvent<HTMLInputElement>, questionId: number) => {
+    e.stopPropagation(); // Prevent the click event from propagating to the question toggle
+
+    const isChecked = e.target.checked;
+    const statusId = statusIds[questionId];
+    setReadStatuses((prevState) => ({ ...prevState, [questionId]: isChecked }));
+
+    try {
+      if (isChecked) {
+        if (statusId != null) {
+          await updateQuestionReadStatus(statusId, { ReadStatus: true });
+        } else {
+          const response = await addQuestionReadStatus({
+            UserEmail: user?.email ?? "",
+            QuestionId: questionId,
+            ReadStatus: true,
+          });
+          setStatusIds((prev) => ({ ...prev, [questionId]: response.data.documentId }));
+        }
+      } else {
+        if (statusId != null) {
+          await updateQuestionReadStatus(statusId, { ReadStatus: false });
+        } else {
+        }
+      }
+    } catch (error) {
+      setReadStatuses((prevState) => ({ ...prevState, [questionId]: !isChecked }));
+    }
+  };
+
   return (
     <div className="my-8 border border-gray-300 p-4">
-      {sortedQuestions.length > 0 && (
-        <h3 className="text-xl mb-2">Top {sortedQuestions.length} Interview Questions</h3>
+      {filteredQaList.length > 0 && (
+        <h3 className="text-xl mb-2">Top {filteredQaList.length} Interview Questions</h3>
       )}
       <div className="space-y-4">
-        {sortedQuestions.map((qa, index) => (
+        {/* Progress Bar */}
+        <div className="mb-4">
+          <label className="text-sm font-semibold">Read Progress</label>
+          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+            <div
+              className="bg-blue-500 h-1.5 rounded-full"
+              style={{ width: `${calculateProgress()}%` }}
+            ></div>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">{Math.round(calculateProgress())}% Complete</p>
+        </div>
+
+        {sortQuestionsByLevel(filteredQaList).map((qa, index) => (
           <div
             key={qa.id}
             className={`bg-gray-100 p-4 rounded shadow-md ${
-              (!isSubscribed && index > 0) ? 'pointer-events-none' : '' // Disable interaction for locked questions
+              !isSubscribed && index > 0 ? 'pointer-events-none' : ''
             }`}
           >
             <summary
@@ -61,7 +130,9 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
                 {(!isSubscribed && index > 0) && (
                   <FaLock className="text-gray-500 mr-2" title="Subscribe to unlock" />
                 )}
-                <span className="text-sm mr-2 px-2 py-1 rounded bg-orange-500 text-white">Add To PDF</span>
+                <span className="text-sm mr-2 px-2 py-1 rounded bg-orange-500 text-white">
+                  Add To PDF
+                </span>
                 <span
                   className={`text-sm mr-2 px-2 py-1 rounded ${
                     qa.question_level.level_name === 'Entry'
@@ -82,14 +153,12 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
                 <input
                   type="checkbox"
                   className="ml-2"
-                  onChange={() => {
-                    // Handle Add to PDF action here
-                  }}
+                  checked={readStatuses[qa.id] || false}
+                  onChange={(e) => handleCheckboxChange(e, qa.id)}
                 />
               </div>
             </summary>
-            {/* Display answers only for questions that are in openQuestions */}
-            {openQuestions.has(qa.id) && (
+            {openQuestions.has(qa.id) &&
               qa.answers.map((answer, answerIndex) => (
                 <div
                   key={answer.id}
@@ -105,8 +174,7 @@ export function QuestionAnswerContent({ filteredQaList }: SectionContentProps) {
                     className="ml-4 text-gray-700"
                   />
                 </div>
-              ))
-            )}
+              ))}
           </div>
         ))}
       </div>
