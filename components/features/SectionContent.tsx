@@ -9,6 +9,7 @@ import { connectWebSocket, disconnectWebSocket } from '@/utils/websocket';
 import { HttpMethod } from '@/helper/enums';
 import { downloadPdfRequest, httpRequest } from '@/helper/apiService';
 import { apiURL } from '@/helper/constants';
+import { toast } from 'react-toastify';
 
 const BASE_URL = process.env.REACT_APP_API_URL || apiURL;
 
@@ -109,6 +110,7 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
     try {
       let fileName: string = `ElevarAI_QAS_${getFormattedDate()}.pdf`;
       setProgress('Starting PDF generation...');
+      toast.info('Starting PDF generation...');
       setFileReady(false); // Reset file-ready state
       setButtonLabel('Generating PDF...');
       await httpRequest<any>('/api/generate-pdf', {
@@ -119,9 +121,12 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
       localStorage.setItem('fileName', fileName);
       setProgress('PDF generation initiated. Please wait...');
 
+
     } catch (error) {
       console.error('Error during PDF generation:', error);
       setProgress('Failed to generate PDF. Try again.');
+      toast.error('Failed to generate PDF. Try again.');
+
     }
   };
 
@@ -143,12 +148,14 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
       document.body.appendChild(link);
       link.click();
       setProgress('PDF downloaded successfully!');
+      toast.info('PDF downloaded successfully!');
       setButtonLabel('Generate PDF'); // Reset button label
       setSelectedQuestions(new Set()); // Clear selected questions
       setFileReady(false);
       localStorage.removeItem('fileName');
     } catch (error) {
       console.error('Error during PDF download:', error);
+      toast.error('Failed to download PDF. Try again.');
       setProgress('Failed to download PDF. Try again.');
     }
   };
