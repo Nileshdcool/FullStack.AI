@@ -1,0 +1,32 @@
+{
+    "kind": "collectionType",
+    "collectionName": "pdfs",
+    "info": {
+      "singularName": "pdf",
+      "pluralName": "pdfs",
+      "displayName": "PDF",
+      "description": "PDF metadata storage"
+    },
+    "options": {
+      "draftAndPublish": false
+    },
+    "attributes": {
+      "title": {
+        "type": "string",
+        "required": true
+      },
+      "description": {
+        "type": "text"
+      },
+      "filePath": {
+        "type": "string"
+      },
+      "createdBy": {
+        "type": "relation",
+        "relation": "oneToOne",
+        "target": "plugin::users-permissions.user",
+        "inversedBy": "pdfs"
+      }
+    }
+  }
+  

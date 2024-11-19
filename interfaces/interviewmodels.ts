@@ -42,5 +42,6 @@ export interface Topic {
   export interface SectionContentProps {
     selectedSection: number;
     filteredQaList: Question[];
+    topicName:string ;
   }
 

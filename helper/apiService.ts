@@ -46,3 +46,24 @@ export const httpRequest = async <T>(endpoint: string, options: ApiOptions): Pro
         }
     }
 };
+
+// apiService.ts
+
+export const downloadPdfRequest = async (selectedQuestions: Set<number>): Promise<Blob> => {
+    const options = {
+      method: HttpMethod.POST,
+      body: {
+        selectedQuestions: Array.from(selectedQuestions),
+      },
+    };
+    
+    try {
+      // Call httpRequest to get the Blob response
+      const response = await httpRequest<Blob>('/api/download-pdf', options);
+  
+      return response; // return the Blob response
+    } catch (error: any) {
+      throw new Error('Failed to download PDF: ' + error.message);
+    }
+  };
+  
