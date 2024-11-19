@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { connectWebSocket, disconnectWebSocket, sendMessage } from '@/utils/websocket';
 
 const useWebsocket = (userId: string, onMessage: (data: any) => void) => {
+    debugger;
   const [connected, setConnected] = useState<boolean>(false);
 
   useEffect(() => {

@@ -33,7 +33,9 @@ export interface Topic {
     Content: string;
     answers: Answer[];
     question_level: QuestionLevel;
-  }
+    readStatus:boolean;
+    statusId:string
+    }
   
   export interface HomeProps {
     initialIndustries: Industry[];

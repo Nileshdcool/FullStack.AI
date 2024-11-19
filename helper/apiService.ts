@@ -1,25 +1,27 @@
+// apiService.ts
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { HttpMethod } from './enums';
 import { apiURL } from './constants';
 import { getAuth } from 'firebase/auth';
 
 const BASE_URL = process.env.REACT_APP_API_URL || apiURL;
-console.log("Base URL:", BASE_URL); // Log base URL
+console.log("Base URL:", BASE_URL); 
 
 interface ApiOptions {
     method: HttpMethod;
-    body?: any; // Optional body for methods like POST, PUT, etc.
-    headers?: Record<string, string>; // Optional headers to override or add custom headers
+    body?: any;
+    headers?: Record<string, string>;
+    isSubscribed?: boolean; // New parameter for subscription status
+    userEmail?: string|null
 }
 
 export const httpRequest = async <T>(endpoint: string, options: ApiOptions): Promise<T> => {
     const auth = getAuth();
     
-    const { method, body, headers } = options;
+    const { method, body, headers, isSubscribed,userEmail } = options;
     const fullUrl = `${BASE_URL}${endpoint}`;
-    console.log("Making request to:", fullUrl); // Log full URL
+    console.log("Making request to:", fullUrl);
 
-    // Retrieve the Bearer token from the current user
     const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
     
     const config: AxiosRequestConfig = {
@@ -27,8 +29,10 @@ export const httpRequest = async <T>(endpoint: string, options: ApiOptions): Pro
         url: fullUrl,
         headers: {
             'Content-Type': 'application/json',
+            'X-User-Email': userEmail ? userEmail : "",  // Pass subscription status
+            'X-User-Subscribed': isSubscribed ? 'true' : 'false',  // Pass subscription status
             ...headers,
-            ...(token ? { Authorization: `Bearer ${token}` } : {}), // Add Bearer token if it exists
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         data: body || undefined,
     };
@@ -37,10 +41,8 @@ export const httpRequest = async <T>(endpoint: string, options: ApiOptions): Pro
         const response: AxiosResponse<T> = await axios(config);
         return response.data;
     } catch (error: any) {
-        console.error("HTTP Request Error:", error); // Log error details
         if (error.response) {
-            console.error("Response data:", error.response.data); // Log response data for context
-            throw new Error(`Error: ${error.response.status} ${error.response.statusText}`);
+        throw new Error(`Error: ${error.response.status} ${error.response.statusText}`);
         } else {
             throw new Error(`Error: ${error.message}`);
         }
