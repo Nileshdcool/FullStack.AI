@@ -17,18 +17,22 @@
     "@strapi/strapi": "5.0.3",
     "@strapi/utils": "^5.1.1",
     "better-sqlite3": "9.4.3",
+    "express": "^4.21.1",
     "firebase-admin": "^12.6.0",
     "fs-extra": "^10.0.0",
     "koa-bodyparser": "^4.4.1",
     "mime-types": "^2.1.27",
+    "puppeteer": "^23.8.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
+    "socket.io": "^4.8.1",
     "stripe": "^17.2.0",
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/puppeteer": "^5.4.7",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "typescript": "^5"

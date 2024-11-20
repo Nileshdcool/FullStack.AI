@@ -6,7 +6,7 @@ interface TopicWithQuestions {
     content: string;
     answers?: Array<{ id: number; content: string }>;
     question_level: { level_name: string };
-    readStatus?: boolean | null; // Updated to allow null
+    readStatus?: boolean | null; // Allow null
     statusId?: string | null; // Add statusId field as optional
   }>;
 }
@@ -40,11 +40,15 @@ export default factories.createCoreController('api::topic.topic', ({ strapi }) =
         return ctx.notFound('Topic not found');
       }
 
+      // Filter out questions without answers
+      topicWithQuestions.questions = topicWithQuestions.questions.filter(
+        (question) => question.answers && question.answers.length > 0
+      );
+
       // Fetch question read statuses for the user based on question id and user email
       const readStatuses = await strapi.entityService.findMany('api::question-read-status.question-read-status', {
         filters: { UserEmail: userEmail },
       });
-      console.log(readStatuses);
 
       // Map read status to questions
       topicWithQuestions.questions = topicWithQuestions.questions.map((question) => {

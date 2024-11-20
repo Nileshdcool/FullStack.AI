@@ -40,6 +40,7 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
   
         // Load questions for the first topic in the first section
         if (firstSection.topics.length > 0) {
+          debugger;
           const firstTopic = firstSection.topics[0];
           setSelectedTopic(firstTopic.id);
           setSelectedBadge(firstTopic.Name);
@@ -147,7 +148,7 @@ const Home: React.FC<HomeProps> = ({ initialIndustries }) => {
       )}
 
       {selectedSection && (
-        <QuestionAnswerContent selectedSection={selectedSection} filteredQaList={questions} />
+        <QuestionAnswerContent selectedSection={selectedSection} filteredQaList={questions} topicName={selectedBadge || ""} />
       )}
     </div>
   );

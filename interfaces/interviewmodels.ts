@@ -1,3 +1,5 @@
+import { WebSocketStatus } from "@/helper/enums";
+
 export interface Topic {
     id: number;
     documentId: string;
@@ -44,5 +46,10 @@ export interface Topic {
   export interface SectionContentProps {
     selectedSection: number;
     filteredQaList: Question[];
+    topicName:string ;
   }
 
+  export interface WebSocketData {
+    message: string; // Type of the progress message
+    status: WebSocketStatus
+  }

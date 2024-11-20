@@ -600,6 +600,33 @@ export interface ApiLoginHistoryLoginHistory
   };
 }
 
+export interface ApiPdfPdf extends Struct.CollectionTypeSchema {
+  collectionName: 'pdfs';
+  info: {
+    singularName: 'pdf';
+    pluralName: 'pdfs';
+    displayName: 'PDF';
+    description: 'PDF metadata storage';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
+    filePath: Schema.Attribute.String;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::pdf.pdf'>;
+  };
+}
+
 export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
   collectionName: 'questions';
   info: {
@@ -1169,6 +1196,7 @@ declare module '@strapi/strapi' {
       'api::global.global': ApiGlobalGlobal;
       'api::industry.industry': ApiIndustryIndustry;
       'api::login-history.login-history': ApiLoginHistoryLoginHistory;
+      'api::pdf.pdf': ApiPdfPdf;
       'api::question.question': ApiQuestionQuestion;
       'api::question-level.question-level': ApiQuestionLevelQuestionLevel;
       'api::question-read-status.question-read-status': ApiQuestionReadStatusQuestionReadStatus;
