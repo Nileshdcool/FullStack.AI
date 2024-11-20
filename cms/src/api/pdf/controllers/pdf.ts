@@ -1,7 +1,8 @@
 import { factories } from '@strapi/strapi';
 import { sendMessage } from '../services/websocket';
 const puppeteer = require('puppeteer');
-const fs = require('fs');
+import path from "path";
+import fs from "fs";
 
 // Define interfaces for Answer and Question
 interface Answer {
@@ -25,7 +26,16 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       let selectedQuestions = ctx.request.body?.selectedQuestions || [];
       const fileName = ctx.request.body?.fileName;
       const topicName = ctx.request.body?.topicName;
-      const pdfStoragePath = process.env.PDF_STORAGE_PATH || "C:/sbangar/personal/FilePath";
+
+      const projectRoot = path.resolve(__dirname); // The directory of the current file
+      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, "storage", "pdfs");
+
+      // Ensure the directory exists
+      if (!fs.existsSync(storagePath)) {
+        fs.mkdirSync(storagePath, { recursive: true }); // Create directory if it doesn't exist
+      }
+
+      const pdfStoragePath = process.env.PDF_STORAGE_PATH || storagePath;
 
 
       if (!fs.existsSync(pdfStoragePath)) {
@@ -205,7 +215,9 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
     try {
 
       const fileName = ctx.request.body?.fileName;
-      const pdfStoragePath = process.env.PDF_STORAGE_PATH || "C:/sbangar/personal/FilePath";
+      const projectRoot = path.resolve(__dirname); 
+      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, "storage", "pdfs");
+      const pdfStoragePath = process.env.PDF_STORAGE_PATH || storagePath;
       const filePath = `${pdfStoragePath}/${fileName}`;
       // Check if the file exists
       if (!fs.existsSync(filePath)) {

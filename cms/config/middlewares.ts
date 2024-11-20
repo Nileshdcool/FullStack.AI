@@ -1,3 +1,7 @@
+// path/to/your/main/config/file
+
+import { FRONTEND_URL, BACKEND_URL, FORM_LIMIT, JSON_LIMIT, MAX_FILE_SIZE } from "./constants";
+
 export default [
     'strapi::errors',
     {
@@ -18,8 +22,8 @@ export default [
         config: {
             enabled: true,
             origin: [
-                process.env.FRONTEND_URL || 'http://localhost:3000', // Frontend origin
-                process.env.BACKEND_URL || 'http://localhost:1337', // Backend origin
+                FRONTEND_URL,  
+                BACKEND_URL,  
             ],
             methods: ["GET", "POST", "PUT"],
             headers: '*', // Allow all headers
@@ -33,10 +37,10 @@ export default [
         config: {
             includeUnparsed: true,
             patchKoa: true,
-            formLimit: '56kb',
-            jsonLimit: '1mb',
+            formLimit: FORM_LIMIT, 
+            jsonLimit: JSON_LIMIT, 
             formidable: {
-                maxFileSize: 200 * 1024 * 1024, // 200 MB limit
+                maxFileSize: MAX_FILE_SIZE, 
             },
             onRouteMatch: (ctx:any) => ctx.path === '/stripe/webhook',
         },

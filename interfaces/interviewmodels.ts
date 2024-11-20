@@ -1,3 +1,5 @@
+import { WebSocketStatus } from "@/helper/enums";
+
 export interface Topic {
     id: number;
     documentId: string;
@@ -49,5 +51,5 @@ export interface Topic {
 
   export interface WebSocketData {
     message: string; // Type of the progress message
-    status: 'completed' | 'in-progress' | 'failed'; // Example statuses
+    status: WebSocketStatus
   }
