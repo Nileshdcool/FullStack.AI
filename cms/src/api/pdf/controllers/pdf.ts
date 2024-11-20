@@ -194,14 +194,10 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
 
 
       await browser.close();
-
-      setTimeout(() => {
         fs.writeFileSync(filePath, pdfBuffer);
         if (userId) {
           sendMessage(userId, { status: 'completed', message: 'PDF generated successfully', filePath });
         }
-      }, 3000);
-
       ctx.body = { message: 'PDF generation started' };
     } catch (error:any) {
       ctx.throw(500, `Failed to generate PDF: ${error.error}`);
