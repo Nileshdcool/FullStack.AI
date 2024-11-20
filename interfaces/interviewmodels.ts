@@ -47,3 +47,7 @@ export interface Topic {
     topicName:string ;
   }
 
+  export interface WebSocketData {
+    message: string; // Type of the progress message
+    status: 'completed' | 'in-progress' | 'failed'; // Example statuses
+  }

@@ -1,20 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { marked } from 'marked';
 import { AppContext } from '@/context/AppContext';
-import { SectionContentProps } from '@/interfaces/interviewmodels';
+import { Question, SectionContentProps, WebSocketData } from '@/interfaces/interviewmodels';
 import { FaLock } from 'react-icons/fa';
 import { addQuestionReadStatus, updateQuestionReadStatus } from '@/services/questionReadStatus';
 import axios from 'axios';
 import { connectWebSocket, disconnectWebSocket } from '@/utils/websocket';
 import { HttpMethod } from '@/helper/enums';
-import { downloadPdfRequest, httpRequest } from '@/helper/apiService';
+import { httpRequest } from '@/helper/apiService';
 import { apiURL } from '@/helper/constants';
 import { toast } from 'react-toastify';
 
 const BASE_URL = process.env.REACT_APP_API_URL || apiURL;
 
 
-const levelOrder = {
+const levelOrder: { [key: string]: number } = {
   Entry: 1,
   Junior: 2,
   Mid: 3,
@@ -22,38 +22,38 @@ const levelOrder = {
   Expert: 5,
 };
 
-const sortQuestionsByLevel = (questions: any) => {
+const sortQuestionsByLevel = (questions: Question[]) => {
   return questions.sort((a, b) => {
-    const levelA: any = a.question_level.level_name;
-    const levelB: any = b.question_level.level_name;
+    const levelA = a.question_level.level_name;
+    const levelB = b.question_level.level_name;
     return (levelOrder[levelA] || 0) - (levelOrder[levelB] || 0);
   });
 };
 
-export function QuestionAnswerContent({ filteredQaList,topicName }: SectionContentProps) {
+
+export function QuestionAnswerContent({ filteredQaList, topicName }: SectionContentProps) {
   debugger;
   const { isSubscribed, user } = useContext(AppContext);
   const [openQuestions, setOpenQuestions] = useState<Set<number>>(new Set());
   const [readStatuses, setReadStatuses] = useState<{ [key: number]: boolean }>({});
   const [statusIds, setStatusIds] = useState<{ [key: number]: string }>({});
   const [selectedQuestions, setSelectedQuestions] = useState<Set<number>>(new Set());
-  const [progress, setProgress] = useState<string | null>(null);
   const [fileReady, setFileReady] = useState<boolean>(false);
   const [buttonLabel, setButtonLabel] = useState<string>('Generate PDF');
   const [selectedTopicName, setSelectedTopicName] = useState<string>('Generate PDF');
 
 
   useEffect(() => {
-    if(topicName!="")
-    {
+    if (topicName != "") {
       setSelectedTopicName(topicName);
     }
     const sortedQuestions = sortQuestionsByLevel(filteredQaList);
-    const initialReadStatuses = {};
-    const initialStatusIds = {};
-    sortedQuestions.forEach((qa: any) => {
-      initialReadStatuses[qa.id] = qa.readStatus;
-      initialStatusIds[qa.id] = qa.statusId;
+    const initialReadStatuses: { [key: number]: boolean } = {};
+    const initialStatusIds: { [key: number]: string } = {}; // Adjust type based on `statusId` type
+
+    sortedQuestions.forEach((qa: Question) => {
+      initialReadStatuses[qa.id] = qa.readStatus; // Assuming `qa.readStatus` is boolean
+      initialStatusIds[qa.id] = qa.statusId;     // Assuming `qa.statusId` is string
     });
 
     setReadStatuses(initialReadStatuses);
@@ -66,9 +66,9 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
 
     if (userId) {
       // Connect WebSocket to listen for progress updates
-      connectWebSocket(userId, (data: any) => {
-        setProgress(data.message); // Update progress message
+      connectWebSocket(userId, (data: WebSocketData) => {
         if (data.status === 'completed') {
+          toast.info('PDF generated successfully!');
           setFileReady(true); // File is ready
           setSelectedQuestions(new Set());
           setButtonLabel("Download PDF");
@@ -108,23 +108,19 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
     if (selectedQuestions.size === 0) return;
 
     try {
-      let fileName: string = `ElevarAI_QAS_${getFormattedDate()}.pdf`;
-      setProgress('Starting PDF generation...');
+      const fileName: string = `ElevarAI_QAS_${getFormattedDate()}.pdf`;
       toast.info('Starting PDF generation...');
       setFileReady(false); // Reset file-ready state
       setButtonLabel('Generating PDF...');
-      await httpRequest<any>('/api/generate-pdf', {
+      await httpRequest<string>('/api/generate-pdf', {
         method: HttpMethod.POST,
         userEmail: user?.email,
-        body: { selectedQuestions: Array.from(selectedQuestions), fileName: fileName, topicName:selectedTopicName },
+        body: { selectedQuestions: Array.from(selectedQuestions), fileName: fileName, topicName: selectedTopicName },
       });
       localStorage.setItem('fileName', fileName);
-      setProgress('PDF generation initiated. Please wait...');
-
 
     } catch (error) {
       console.error('Error during PDF generation:', error);
-      setProgress('Failed to generate PDF. Try again.');
       toast.error('Failed to generate PDF. Try again.');
 
     }
@@ -133,7 +129,6 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
   const downloadPdf = async (): Promise<void> => {
     try {
       debugger;
-      setProgress('Downloading PDF...');
       const fileName = localStorage.getItem('fileName');
       const fullUrl = `${BASE_URL}` + "/api/download-pdf";
       const response = await axios.post(fullUrl, {
@@ -147,7 +142,6 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
       link.setAttribute('download', fileName || 'questions.pdf');
       document.body.appendChild(link);
       link.click();
-      setProgress('PDF downloaded successfully!');
       toast.info('PDF downloaded successfully!');
       setButtonLabel('Generate PDF'); // Reset button label
       setSelectedQuestions(new Set()); // Clear selected questions
@@ -156,7 +150,6 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
     } catch (error) {
       console.error('Error during PDF download:', error);
       toast.error('Failed to download PDF. Try again.');
-      setProgress('Failed to download PDF. Try again.');
     }
   };
 
@@ -179,7 +172,7 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
     return totalQuestions > 0 ? (readQuestions / totalQuestions) * 100 : 0;
   };
 
-  const handleCheckboxChange = async (e, questionId: number) => {
+  const handleCheckboxChange = async (e:React.ChangeEvent<HTMLInputElement>, questionId: number) => {
     e.stopPropagation();
     const isChecked = e.target.checked;
     const statusId = statusIds[questionId];
@@ -202,6 +195,8 @@ export function QuestionAnswerContent({ filteredQaList,topicName }: SectionConte
       }
     } catch (error) {
       setReadStatuses((prevState) => ({ ...prevState, [questionId]: !isChecked }));
+      console.log(error)
+
     }
   };
 

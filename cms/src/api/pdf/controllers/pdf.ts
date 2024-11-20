@@ -22,13 +22,10 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         ? ctx.request.headers['x-user-email'][0]
         : ctx.request.headers['x-user-email'];
 
-      let selectedQuestions = ctx.request.body?.selectedQuestions || []; 
+      let selectedQuestions = ctx.request.body?.selectedQuestions || [];
       const fileName = ctx.request.body?.fileName;
       const topicName = ctx.request.body?.topicName;
-
       const pdfStoragePath = process.env.PDF_STORAGE_PATH || "C:/sbangar/personal/FilePath";
-      console.log("pdfStoragePath", pdfStoragePath)
-
       if (selectedQuestions.length > 0) {
         selectedQuestions = Array.from({ length: 100 }, (_, i) => i + 1); // Default to [1, 2, ..., 100]
       }
@@ -37,7 +34,9 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         fs.mkdirSync(pdfStoragePath, { recursive: true });
       }
       const filePath = `${pdfStoragePath}/${fileName}`;
-      sendMessage(userId, { status: 'in-progress', message: 'PDF generation started' });
+      if (userId) {
+        sendMessage(userId, { status: 'in-progress', message: 'PDF generation started' });
+      }
 
       const questionsResponse = await strapi.entityService.findMany('api::question.question', {
         filters: { id: { $in: selectedQuestions } },
@@ -53,7 +52,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         })),
       }));
 
-      const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0); 
+      const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0);
 
       const htmlContent = `
     <!DOCTYPE html>
@@ -179,32 +178,33 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         `,
       });
 
-     const pdfBuffer = await page.pdf({
-  format: 'A4',
-  displayHeaderFooter: true,
-  headerTemplate: `
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        displayHeaderFooter: true,
+        headerTemplate: `
     <div style="font-size: 16px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;">
       Elevar.AI - Kill Your Interview
     </div>`,
-  footerTemplate: `
+        footerTemplate: `
     <div style="font-size: 10px; text-align: center; width: 100%; padding: 10px 0;">
       <span class="pageNumber"></span> / <span class="totalPages"></span>
     </div>`,
-  margin: { top: '40px', bottom: '50px', left: '50px', right: '50px' }, // Increase top margin if needed
-});
+        margin: { top: '40px', bottom: '50px', left: '50px', right: '50px' }, // Increase top margin if needed
+      });
 
 
       await browser.close();
 
       setTimeout(() => {
         fs.writeFileSync(filePath, pdfBuffer);
-        sendMessage(userId, { status: 'completed', message: 'PDF generated successfully', filePath });
-      }, 3000); 
+        if (userId) {
+          sendMessage(userId, { status: 'completed', message: 'PDF generated successfully', filePath });
+        }
+      }, 3000);
 
       ctx.body = { message: 'PDF generation started' };
-    } catch (error) {
-      console.error('Failed to generate PDF:', error);
-      ctx.throw(500, `Failed to generate PDF: ${error.message}`);
+    } catch (error:any) {
+      ctx.throw(500, `Failed to generate PDF: ${error.error}`);
     }
   },
   async downloadPdf(ctx) {
@@ -213,8 +213,6 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       const fileName = ctx.request.body?.fileName;
       const pdfStoragePath = process.env.PDF_STORAGE_PATH || "C:/sbangar/personal/FilePath";
       const filePath = `${pdfStoragePath}/${fileName}`;
-      // const filePath = "C:/sbangar/personal/FilePath/generated-SachinBangar.pdf";
-
       // Check if the file exists
       if (!fs.existsSync(filePath)) {
         ctx.throw(404, 'File not found');

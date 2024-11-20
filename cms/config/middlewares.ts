@@ -38,7 +38,7 @@ export default [
             formidable: {
                 maxFileSize: 200 * 1024 * 1024, // 200 MB limit
             },
-            onRouteMatch: (ctx) => ctx.path === '/stripe/webhook',
+            onRouteMatch: (ctx:any) => ctx.path === '/stripe/webhook',
         },
     },
     'strapi::session',
