@@ -664,6 +664,37 @@ export interface ApiQuestionLevelQuestionLevel
   };
 }
 
+export interface ApiQuestionReadStatusQuestionReadStatus
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'question_read_statuses';
+  info: {
+    singularName: 'question-read-status';
+    pluralName: 'question-read-statuses';
+    displayName: 'QuestionReadStatus';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    ReadStatus: Schema.Attribute.Boolean;
+    UserEmail: Schema.Attribute.String;
+    QuestionId: Schema.Attribute.BigInteger;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::question-read-status.question-read-status'
+    >;
+  };
+}
+
 export interface ApiSectionSection extends Struct.CollectionTypeSchema {
   collectionName: 'sections';
   info: {
@@ -1140,6 +1171,7 @@ declare module '@strapi/strapi' {
       'api::login-history.login-history': ApiLoginHistoryLoginHistory;
       'api::question.question': ApiQuestionQuestion;
       'api::question-level.question-level': ApiQuestionLevelQuestionLevel;
+      'api::question-read-status.question-read-status': ApiQuestionReadStatusQuestionReadStatus;
       'api::section.section': ApiSectionSection;
       'api::subscription.subscription': ApiSubscriptionSubscription;
       'api::topic.topic': ApiTopicTopic;

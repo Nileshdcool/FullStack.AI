@@ -29,15 +29,14 @@ export default function Sidebar() {
                 </div>
             )}
 
-
             {/* Disable menu if user is not logged in */}
-            <nav className={`${!isuserSubscribed ? 'pointer-events-none opacity-50' : ''}`}>
                 <ul>
                     <li>
                         <Link legacyBehavior href="/">
                             <a className={isActive("/") ? "bg-blue-700" : ""}>Home</a>
                         </Link>
                     </li>
+            <nav className={`${!isuserSubscribed ? 'pointer-events-none opacity-50' : ''}`}>
 
                     {/* Conditional rendering based on industry */}
                     {selectedIndustry === "Technology" && (
@@ -139,14 +138,14 @@ export default function Sidebar() {
                             </ul>
                         </details>
                     </li>
-
+                    </nav>
                     <li>
                         <Link legacyBehavior href="/about">
                             <a>About</a>
                         </Link>
                     </li>
                 </ul>
-            </nav>
+          
         </aside>
     );
 }

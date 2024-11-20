@@ -10,6 +10,6 @@ export default {
         auth: false, // Disable Strapi's default authentication for this route
           policies: ['global::firebaseAuth'], // Apply Firebase auth policy
       },
-    },
+    },  
   ],
 };
