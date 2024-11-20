@@ -26,9 +26,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       const fileName = ctx.request.body?.fileName;
       const topicName = ctx.request.body?.topicName;
       const pdfStoragePath = process.env.PDF_STORAGE_PATH || "C:/sbangar/personal/FilePath";
-      if (selectedQuestions.length > 0) {
-        selectedQuestions = Array.from({ length: 100 }, (_, i) => i + 1); // Default to [1, 2, ..., 100]
-      }
+
 
       if (!fs.existsSync(pdfStoragePath)) {
         fs.mkdirSync(pdfStoragePath, { recursive: true });
