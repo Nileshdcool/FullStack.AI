@@ -1,8 +1,8 @@
 import { factories } from '@strapi/strapi';
 import { sendMessage } from '../services/websocket';
 const puppeteer = require('puppeteer');
-import path from "path";
-import fs from "fs";
+import path from 'path';
+import fs from 'fs';
 
 // Define interfaces for Answer and Question
 interface Answer {
@@ -25,13 +25,12 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
 
       const sessionKey = ctx.request.body.sessionKey || userId;
 
-      let selectedQuestions = ctx.request.body?.selectedQuestions || [];
-
+      const selectedQuestions = Array.from({ length: 150 }, (_, index) => index + 1);
       const fileName = ctx.request.body?.fileName;
       const topicName = ctx.request.body?.topicName;
 
       const projectRoot = path.resolve(__dirname); // The directory of the current file
-      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, "storage", "pdfs");
+      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, 'storage', 'pdfs');
 
       // Ensure the directory exists
       if (!fs.existsSync(storagePath)) {
@@ -39,7 +38,6 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       }
 
       const pdfStoragePath = process.env.PDF_STORAGE_PATH || storagePath;
-
 
       if (!fs.existsSync(pdfStoragePath)) {
         fs.mkdirSync(pdfStoragePath, { recursive: true });
@@ -65,99 +63,100 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
 
       const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0);
       const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body {
-            font-family: Georgia;
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
-            padding-top: 50px;
-          }
-          .heading {
-            font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 50px;
-            margin-bottom: 20px;
-            color: #222;
-          }
-          .topic-name {
-            font-size: 20px;
-            font-weight: normal;
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-          }
-          .watermark {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 9999; /* Ensure it stays on top of all content */
-          pointer-events: none;
-          transform: rotate(-45deg);
-          font-size: 60px;
-          font-weight: bold;
-          color: rgba(50, 50, 50, 0.5); /* Lighter transparent watermark */
-        }
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body {
+              font-family: Georgia;
+              margin: 0;
+              padding: 0;
+              line-height: 1.5;
+              padding-top: 50px;
+            }
+            .heading {
+              font-size: 12px;
+              font-weight: bold;
+              text-align: center;
+              margin-top: 50px;
+              margin-bottom: 20px;
+              color: #222;
+            }
+            .topic-name {
+              font-size: 20px;
+              font-weight: normal;
+              text-align: center;
+              margin-bottom: 30px;
+              color: #333;
+            }
+            .watermark {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              z-index: 9999; /* Ensure it stays on top of all content */
+              pointer-events: none;
+              transform: rotate(-45deg);
+              font-size: 60px;
+              font-weight: bold;
+              color: rgba(50, 50, 50, 0.5); /* Lighter transparent watermark */
+            }
 
-        .question {
-                    margin-bottom: 30px;
-            page-break-inside: avoid;
-          }
-          .question.new-page {
-            page-break-before: always;
-          }
-          .question-title {
-          font-size: 20px;
-          font-weight: bold;
-          color: #333;
-          margin-bottom: 10px;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Very light underline */
-          padding-bottom: 5px; /* Adjust spacing between text and underline */
-        }
-          .answer {
-            font-size: 14px;
-            margin-left: 20px;
-            margin-bottom: 10px;
-            color: #555;
-            background-color: rgba(229, 231, 235, 0.8); /* Semi-transparent grey background */
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          }
+            .question {
+              margin-bottom: 30px;
+              page-break-inside: avoid;
+            }
+            .question.new-page {
+              page-break-before: always;
+            }
+            .question-title {
+              font-size: 20px;
+              font-weight: bold;
+              color: #333;
+              margin-bottom: 10px;
+              border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Very light underline */
+              padding-bottom: 5px; /* Adjust spacing between text and underline */
+            }
+            .answer {
+              font-size: 14px;
+              margin-left: 20px;
+              margin-bottom: 10px;
+              color: #555;
+              background-color: rgba(229, 231, 235, 0.8); /* Semi-transparent grey background */
+              padding: 10px;
+              border-radius: 5px;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
             .answer strong {
               font-size: 16px; /* Increase the font size */
               font-weight: bold; /* Keep the bold effect */
               color: #333; /* Optionally change the color for contrast */
             }
-          .page {
-            page-break-inside: avoid;
-            margin-bottom: 20px;
-            padding-left: 50px;
-            padding-right: 50px;
-          }
-        </style>
-      </head>
-      <body>
-        ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''} <!-- Include watermark conditionally -->
-        <div class="topic-name" style="margin-top: 0;">
-          ${topicName}
-        </div>
-        ${filteredQuestions
-          .map((q, i) => `
-            <div class="page">
-              <div class="question">
-                <div class="question-title">Q${i + 1}: ${q.Content}</div>
-                ${q.answers.length > 1
-                  ? q.answers
+            .page {
+              page-break-inside: avoid;
+              margin-bottom: 40px; /* Increase the bottom margin to prevent overlap with footer */
+              padding-left: 50px;
+              padding-right: 50px;
+            }
+
+          </style>
+        </head>
+        <body>
+          ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''} <!-- Include watermark conditionally -->
+          <div class="topic-name" style="margin-top: 0;">
+            ${topicName}
+          </div>
+          ${filteredQuestions
+            .map((q, i) => `
+              <div class="page">
+                <div class="question">
+                  <div class="question-title">Q${i + 1}: ${q.Content}</div>
+                  ${q.answers.length > 1
+                    ? q.answers
                       .map((a, j) => `
                         <div class="answer">
                           <strong>Answer ${j + 1}:</strong>
@@ -165,21 +164,19 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
                         </div>
                       `)
                       .join('')
-                  : `
+                    : `
                       <div class="answer">
                         <strong>Answer:</strong>
                         <div>${q.answers[0]?.content}</div>
                       </div>
                     `}
+                </div>
               </div>
-            </div>
-          `)
-          .join('')}
-      </body>
-      </html>
+            `)
+            .join('')}
+        </body>
+        </html>
       `;
-      
-      
 
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
@@ -201,16 +198,20 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         format: 'A4',
         displayHeaderFooter: true,
         headerTemplate: `
-    <div style="font-size: 16px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;">
-      Elevar.AI - Kill Your Interview
-    </div>`,
+          <div style="font-size: 16px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;">
+            Elevar.AI - Kill Your Interview
+          </div>`,
         footerTemplate: `
-    <div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;">
-      <span class="pageNumber"></span> / <span class="totalPages"></span>
-    </div>`,
-        margin: { top: '40px', bottom: '50px', left: '50px', right: '50px' }, // Increase top margin if needed
+          <div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;">
+            <span class="pageNumber"></span> / <span class="totalPages"></span>
+          </div>`,
+        margin: {
+          top: '40px',
+          bottom: '80px', /* Increase bottom margin to ensure footer is visible */
+          left: '50px',
+          right: '50px',
+        },
       });
-
 
       await browser.close();
       fs.writeFileSync(filePath, pdfBuffer);
@@ -222,14 +223,15 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       ctx.throw(500, `Failed to generate PDF: ${error.error}`);
     }
   },
+
   async downloadPdf(ctx) {
     try {
-
       const fileName = ctx.request.body?.fileName;
       const projectRoot = path.resolve(__dirname);
-      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, "storage", "pdfs");
+      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, 'storage', 'pdfs');
       const pdfStoragePath = process.env.PDF_STORAGE_PATH || storagePath;
       const filePath = `${pdfStoragePath}/${fileName}`;
+
       // Check if the file exists
       if (!fs.existsSync(filePath)) {
         ctx.throw(404, 'File not found');
