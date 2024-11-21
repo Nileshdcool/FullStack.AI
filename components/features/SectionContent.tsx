@@ -71,6 +71,9 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
       // Connect WebSocket to listen for progress updates
       connectWebSocket(sessionKey, (data: WebSocketData) => {
         if (data.status === WebSocketStatus.Completed) {
+          toast.info('PDF generated successfully!', {
+            autoClose: 500, 
+          });
           setFileReady(true); // File is ready
           setSelectedQuestions(new Set());
           setButtonLabel("Download PDF");
@@ -146,6 +149,9 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
     setSelectedQuestions(new Set());
     setFileReady(false);
     localStorage.removeItem('fileName');
+    toast.info('PDF downloaded successfully!', {
+      autoClose: 500, 
+    });
   } catch (error) {
     console.error('Error during PDF download:', error);
     toast.error('Failed to download PDF. Try again.');
@@ -296,7 +302,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
                     />
                   </>
                 )}
-                {!isSubscribed && index > freeQuestiontoRead && <FaLock className="text-gray-500 ml-2" />}
+                {!isSubscribed && index+1 > freeQuestiontoRead && <FaLock className="text-gray-500 ml-2" />}
               </div>
             </summary>
             {/* <div

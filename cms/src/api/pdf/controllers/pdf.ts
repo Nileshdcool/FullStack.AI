@@ -26,6 +26,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       const sessionKey = ctx.request.body.sessionKey || userId;
 
       let selectedQuestions = ctx.request.body?.selectedQuestions || [];
+
       const fileName = ctx.request.body?.fileName;
       const topicName = ctx.request.body?.topicName;
 
@@ -115,11 +116,13 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
             page-break-before: always;
           }
           .question-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-          }
+          font-size: 20px;
+          font-weight: bold;
+          color: #333;
+          margin-bottom: 10px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Very light underline */
+          padding-bottom: 5px; /* Adjust spacing between text and underline */
+        }
           .answer {
             font-size: 14px;
             margin-left: 20px;
