@@ -25,7 +25,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
 
       const sessionKey = ctx.request.body.sessionKey || userId;
 
-      const selectedQuestions = Array.from({ length: 150 }, (_, index) => index + 1);
+      const selectedQuestions = ctx.request.body?.selectedQuestions || [];
       const fileName = ctx.request.body?.fileName;
       const topicName = ctx.request.body?.topicName;
 
@@ -62,121 +62,141 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       }));
 
       const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0);
+
       const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body {
-              font-family: Georgia;
-              margin: 0;
-              padding: 0;
-              line-height: 1.5;
-              padding-top: 50px;
-            }
-            .heading {
-              font-size: 12px;
-              font-weight: bold;
-              text-align: center;
-              margin-top: 50px;
-              margin-bottom: 20px;
-              color: #222;
-            }
-            .topic-name {
-              font-size: 20px;
-              font-weight: normal;
-              text-align: center;
-              margin-bottom: 30px;
-              color: #333;
-            }
-            .watermark {
-              position: fixed;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              z-index: 9999; /* Ensure it stays on top of all content */
-              pointer-events: none;
-              transform: rotate(-45deg);
-              font-size: 60px;
-              font-weight: bold;
-              color: rgba(50, 50, 50, 0.5); /* Lighter transparent watermark */
-            }
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <style>
+      body {
+        font-family: Georgia;
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+        padding-top: 50px;
+      }
+      .heading {
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 50px;
+        margin-bottom: 20px;
+        color: #222;
+      }
+      .topic-name {
+        font-size: 20px;
+        font-weight: normal;
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+      }
+      .watermark {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Ensure it stays on top of all content */
+        pointer-events: none;
+        transform: rotate(-45deg);
+        font-size: 60px;
+        font-weight: bold;
+        color: rgba(50, 50, 50, 0.5); /* Lighter transparent watermark */
+      }
 
-            .question {
-              margin-bottom: 30px;
-              page-break-inside: avoid;
-            }
-            .question.new-page {
-              page-break-before: always;
-            }
-            .question-title {
-              font-size: 20px;
-              font-weight: bold;
-              color: #333;
-              margin-bottom: 10px;
-              border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Very light underline */
-              padding-bottom: 5px; /* Adjust spacing between text and underline */
-            }
-            .answer {
-              font-size: 14px;
-              margin-left: 20px;
-              margin-bottom: 10px;
-              color: #555;
-              background-color: rgba(229, 231, 235, 0.8); /* Semi-transparent grey background */
-              padding: 10px;
-              border-radius: 5px;
-              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-            .answer strong {
-              font-size: 16px; /* Increase the font size */
-              font-weight: bold; /* Keep the bold effect */
-              color: #333; /* Optionally change the color for contrast */
-            }
-            .page {
-              page-break-inside: avoid;
-              margin-bottom: 40px; /* Increase the bottom margin to prevent overlap with footer */
-              padding-left: 50px;
-              padding-right: 50px;
-            }
+      .question {
+        margin-bottom: 30px;
+        page-break-inside: avoid;
+      }
+      .question.new-page {
+        page-break-before: always;
+      }
+      .question-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Very light underline */
+        padding-bottom: 5px; /* Adjust spacing between text and underline */
+      }
+      .answer {
+        font-size: 14px;
+        margin-left: 20px;
+        margin-bottom: 10px;
+        color: #555;
+        background-color: rgba(229, 231, 235, 0.8); /* Semi-transparent grey background */
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .answer strong {
+        font-size: 16px; /* Increase the font size */
+        font-weight: bold; /* Keep the bold effect */
+        color: #333; /* Optionally change the color for contrast */
+      }
+      .page {
+        page-break-inside: avoid;
+        margin-bottom: 40px; /* Increase the bottom margin to prevent overlap with footer */
+        padding-left: 50px;
+        padding-right: 50px;
+      }
 
-          </style>
-        </head>
-        <body>
-          ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''} <!-- Include watermark conditionally -->
-          <div class="topic-name" style="margin-top: 0;">
-            ${topicName}
-          </div>
-          ${filteredQuestions
-            .map((q, i) => `
-              <div class="page">
-                <div class="question">
-                  <div class="question-title">Q${i + 1}: ${q.Content}</div>
-                  ${q.answers.length > 1
-                    ? q.answers
-                      .map((a, j) => `
-                        <div class="answer">
-                          <strong>Answer ${j + 1}:</strong>
-                          <div>${a.content}</div>
-                        </div>
-                      `)
-                      .join('')
-                    : `
-                      <div class="answer">
-                        <strong>Answer:</strong>
-                        <div>${q.answers[0]?.content}</div>
-                      </div>
-                    `}
+      @media print {
+        body {
+          margin: 0;
+          padding: 0;
+        }
+
+        .watermark {
+          display: none; /* Hide watermark during PDF generation */
+        }
+
+        .page {
+          margin-bottom: 60px; /* Adjust bottom margin to ensure footer visibility */
+        }
+
+        .page-number {
+          page-break-before: always; /* Forces page break before page numbers */
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+    ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''} <!-- Include watermark conditionally -->
+    <div class="topic-name" style="margin-top: 0;">
+      ${topicName}
+    </div>
+    ${filteredQuestions
+          .map((q, i) => `
+        <div class="page">
+          <div class="question">
+            <div class="question-title">Q${i + 1}: ${q.Content}</div>
+            ${q.answers.length > 1
+              ? q.answers
+                .map((a, j) => `
+                  <div class="answer">
+                    <strong>Answer ${j + 1}:</strong>
+                    <div>${a.content}</div>
+                  </div>
+                `)
+                .join('')
+              : `
+                <div class="answer">
+                  <strong>Answer:</strong>
+                  <div>${q.answers[0]?.content}</div>
                 </div>
-              </div>
-            `)
-            .join('')}
-        </body>
-        </html>
-      `;
+              `}
+          </div>
+        </div>
+      `)
+          .join('')}
+  </body>
+  </html>
+`;
 
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
