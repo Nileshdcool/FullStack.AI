@@ -8,7 +8,7 @@ import axios from 'axios';
 import { connectWebSocket, disconnectWebSocket } from '@/utils/websocket';
 import { HttpMethod, WebSocketStatus } from '@/helper/enums';
 import { httpRequest } from '@/helper/apiService';
-import { apiURL } from '@/helper/constants';
+import { apiURL, freeQuestiontoRead } from '@/helper/constants';
 import { toast } from 'react-toastify';
 import { getSessionKey } from '@/helper/sessionKey';
 
@@ -255,7 +255,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
         {sortQuestionsByLevel(filteredQaList).map((qa, index) => (
           <div
             key={qa.id}
-            className={`bg-gray-100 p-4 rounded shadow-md ${!isSubscribed && index > 0 ? 'pointer-events-none' : ''}`}
+            className={`bg-gray-100 p-4 rounded shadow-md ${!isSubscribed && index > freeQuestiontoRead ? 'pointer-events-none' : ''}`}
           >
             <summary
               className="cursor-pointer font-semibold flex items-center justify-between"
@@ -279,7 +279,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
                 >
                   {qa.question_level.level_name}
                 </span>
-                {(isSubscribed || index === 0) && (
+                {(isSubscribed || index < freeQuestiontoRead) && (
                   <>
                     <button
                       onClick={() => handleAddToPdf(qa.id)}
@@ -296,7 +296,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
                     />
                   </>
                 )}
-                {!isSubscribed && index > 0 && <FaLock className="text-gray-500 ml-2" />}
+                {!isSubscribed && index > freeQuestiontoRead && <FaLock className="text-gray-500 ml-2" />}
               </div>
             </summary>
             {/* <div

@@ -63,7 +63,6 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       }));
 
       const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0);
-
       const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -92,31 +91,31 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
             color: #333;
           }
           .watermark {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: -1;
-  pointer-events: none;
-  transform: rotate(-45deg);
-  font-size: 60px;
-  font-weight: bold;
-  color: rgba(50, 50, 50, 0.7); /* Slightly darker watermark */
-}
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999; /* Ensure it stays on top of all content */
+          pointer-events: none;
+          transform: rotate(-45deg);
+          font-size: 60px;
+          font-weight: bold;
+          color: rgba(50, 50, 50, 0.5); /* Lighter transparent watermark */
+        }
 
-          .question {
-            margin-bottom: 30px;
+        .question {
+                    margin-bottom: 30px;
             page-break-inside: avoid;
           }
           .question.new-page {
             page-break-before: always;
           }
           .question-title {
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
             color: #333;
             margin-bottom: 10px;
@@ -130,10 +129,12 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            position: relative; /* Ensure proper stacking order */
-            z-index: 2; /* Maintain relative stacking context */
           }
-
+            .answer strong {
+              font-size: 16px; /* Increase the font size */
+              font-weight: bold; /* Keep the bold effect */
+              color: #333; /* Optionally change the color for contrast */
+            }
           .page {
             page-break-inside: avoid;
             margin-bottom: 20px;
@@ -143,44 +144,39 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         </style>
       </head>
       <body>
-        <div class="watermark">Elevar.AI</div>
+        ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''} <!-- Include watermark conditionally -->
         <div class="topic-name" style="margin-top: 0;">
           ${topicName}
         </div>
         ${filteredQuestions
-          .map((q, i) => {
-            const shouldForceNewPage = q.answers.some((a) => a.content.length > 500);
-            return `
-              <div class="page">
-                <div class="question ${shouldForceNewPage ? 'new-page' : ''}">
-                  <div class="question-title">Q${i + 1}: ${q.Content}</div>
-                  ${q.answers.length > 1
-                ? q.answers
-                  .map((a, j) => `
+          .map((q, i) => `
+            <div class="page">
+              <div class="question">
+                <div class="question-title">Q${i + 1}: ${q.Content}</div>
+                ${q.answers.length > 1
+                  ? q.answers
+                      .map((a, j) => `
                         <div class="answer">
                           <strong>Answer ${j + 1}:</strong>
                           <div>${a.content}</div>
                         </div>
-                        <br/>
                       `)
-                  .join('')
-                : `
-                        <div class="answer">
-                          <strong>Answer:</strong>
-                          <div>${q.answers[0]?.content}</div>
-                        </div>
-                        <br/>
-                      `
-              }
-                </div>
+                      .join('')
+                  : `
+                      <div class="answer">
+                        <strong>Answer:</strong>
+                        <div>${q.answers[0]?.content}</div>
+                      </div>
+                    `}
               </div>
-            `;
-          })
+            </div>
+          `)
           .join('')}
       </body>
       </html>
       `;
-
+      
+      
 
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
@@ -206,7 +202,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       Elevar.AI - Kill Your Interview
     </div>`,
         footerTemplate: `
-    <div style="font-size: 10px; text-align: center; width: 100%; padding: 10px 0;">
+    <div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;">
       <span class="pageNumber"></span> / <span class="totalPages"></span>
     </div>`,
         margin: { top: '40px', bottom: '50px', left: '50px', right: '50px' }, // Increase top margin if needed
