@@ -1,12 +1,15 @@
+import { apiURL } from '@/helper/constants';
 import { io, Socket } from 'socket.io-client';
 
 let socket: Socket | null = null;
+
+const socketServer = process.env.REACT_APP_API_URL || apiURL;
 
 // Connect to WebSocket (Socket.io client)
 export const connectWebSocket = (userId: string, onMessage: (data: any) => void) => {
   if (!socket || socket.connected === false) {
     // Establish a connection to the server
-    socket = io('http://localhost:1337', {
+    socket = io(socketServer, {
       query: { userId }, // Pass the userId as a query parameter
       transports: ['websocket'], // Use WebSocket as the transport
     });
@@ -22,7 +25,6 @@ export const connectWebSocket = (userId: string, onMessage: (data: any) => void)
 
     // Handle Socket.io connection
     socket.on('connect', () => {
-      console.log('Socket.io connection established');
       
       // Register the user once connected
       if (socket) {

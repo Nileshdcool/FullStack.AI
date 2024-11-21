@@ -6,10 +6,11 @@ import { FaLock } from 'react-icons/fa';
 import { addQuestionReadStatus, updateQuestionReadStatus } from '@/services/questionReadStatus';
 import axios from 'axios';
 import { connectWebSocket, disconnectWebSocket } from '@/utils/websocket';
-import { HttpMethod } from '@/helper/enums';
+import { HttpMethod, WebSocketStatus } from '@/helper/enums';
 import { httpRequest } from '@/helper/apiService';
 import { apiURL } from '@/helper/constants';
 import { toast } from 'react-toastify';
+import { getSessionKey } from '@/helper/sessionKey';
 
 const BASE_URL = process.env.REACT_APP_API_URL || apiURL;
 
@@ -41,6 +42,8 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
   const [fileReady, setFileReady] = useState<boolean>(false);
   const [buttonLabel, setButtonLabel] = useState<string>('Generate PDF');
   const [selectedTopicName, setSelectedTopicName] = useState<string>('Generate PDF');
+  const [loading, setLoading] = useState(false); // Loading state
+
 
 
   useEffect(() => {
@@ -62,13 +65,12 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
   }, [filteredQaList]);
 
   useEffect(() => {
-    const userId = user?.email ?? ''; // Replace with a real user ID for WebSocket connection
-
-    if (userId) {
+    const sessionKey = user?.email || getSessionKey();
+    
+    if (sessionKey) {
       // Connect WebSocket to listen for progress updates
-      connectWebSocket(userId, (data: WebSocketData) => {
-        if (data.status === 'completed') {
-          toast.info('PDF generated successfully!');
+      connectWebSocket(sessionKey, (data: WebSocketData) => {
+        if (data.status === WebSocketStatus.Completed) {
           setFileReady(true); // File is ready
           setSelectedQuestions(new Set());
           setButtonLabel("Download PDF");
@@ -104,54 +106,53 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
   };
 
   const generatePdf = async (): Promise<void> => {
-    debugger;
-    if (selectedQuestions.size === 0) return;
+  if (selectedQuestions.size === 0) return;
 
-    try {
-      const fileName: string = `ElevarAI_QAS_${getFormattedDate()}.pdf`;
-      toast.info('Starting PDF generation...');
-      setFileReady(false); // Reset file-ready state
-      setButtonLabel('Generating PDF...');
-      await httpRequest<string>('/api/generate-pdf', {
-        method: HttpMethod.POST,
-        userEmail: user?.email,
-        body: { selectedQuestions: Array.from(selectedQuestions), fileName: fileName, topicName: selectedTopicName },
-      });
-      localStorage.setItem('fileName', fileName);
+  try {
+    const sessionKey = user?.email || getSessionKey();
+    const fileName: string = `ElevarAI_QAS_${getFormattedDate()}.pdf`;
+    setLoading(true); // Start loading
+    setFileReady(false);
+    setButtonLabel('Generating PDF...');
+    await httpRequest<string>('/api/generate-pdf', {
+      method: HttpMethod.POST,
+      userEmail: user?.email,
+      body: { selectedQuestions: Array.from(selectedQuestions), fileName: fileName, topicName: selectedTopicName, sessionKey:sessionKey },
+    });
+    localStorage.setItem('fileName', fileName);
+    setFileReady(true); // File is ready
+  } catch (error) {
+    console.error('Error during PDF generation:', error);
+    toast.error('Failed to generate PDF. Try again.');
+  } finally {
+    setLoading(false); // End loading
+  }
+};
 
-    } catch (error) {
-      console.error('Error during PDF generation:', error);
-      toast.error('Failed to generate PDF. Try again.');
-
-    }
-  };
 
   const downloadPdf = async (): Promise<void> => {
-    try {
-      debugger;
-      const fileName = localStorage.getItem('fileName');
-      const fullUrl = `${BASE_URL}` + "/api/download-pdf";
-      const response = await axios.post(fullUrl, {
-        fileName: fileName,
-      }, {
-        responseType: 'blob',
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName || 'questions.pdf');
-      document.body.appendChild(link);
-      link.click();
-      toast.info('PDF downloaded successfully!');
-      setButtonLabel('Generate PDF'); // Reset button label
-      setSelectedQuestions(new Set()); // Clear selected questions
-      setFileReady(false);
-      localStorage.removeItem('fileName');
-    } catch (error) {
-      console.error('Error during PDF download:', error);
-      toast.error('Failed to download PDF. Try again.');
-    }
-  };
+  try {
+    const fileName = localStorage.getItem('fileName');
+    const fullUrl = `${BASE_URL}` + "/api/download-pdf";
+    setLoading(true); // Start loading
+    const response = await axios.post(fullUrl, { fileName }, { responseType: 'blob' });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', fileName || 'questions.pdf');
+    document.body.appendChild(link);
+    link.click();
+    setButtonLabel('Generate PDF');
+    setSelectedQuestions(new Set());
+    setFileReady(false);
+    localStorage.removeItem('fileName');
+  } catch (error) {
+    console.error('Error during PDF download:', error);
+    toast.error('Failed to download PDF. Try again.');
+  } finally {
+    setLoading(false); // End loading
+  }
+};
 
 
   const toggleQuestion = (id: number) => {
@@ -205,16 +206,41 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
       {filteredQaList.length > 0 && (
         <h3 className="text-xl mb-2">Top {filteredQaList.length} Interview Questions</h3>
       )}
-      <div className="mb-4 flex justify-end">
-        <button
-          disabled={selectedQuestions.size === 0 && !fileReady}
-          onClick={fileReady ? downloadPdf : generatePdf}
-          className={`px-4 py-2 rounded ${fileReady ? 'bg-green-500' : 'bg-blue-500'} text-white`}
-        >
-          {buttonLabel}
-        </button>
-        {/* {progress && <p className="ml-4 text-gray-700">{progress}</p>} */}
-      </div>
+     <div className="mb-4 flex justify-end">
+      <button
+        disabled={selectedQuestions.size === 0 && !fileReady || loading}
+        onClick={fileReady ? downloadPdf : generatePdf}
+        className={`flex items-center px-4 py-2 rounded ${fileReady ? 'bg-green-500' : 'bg-blue-500'} text-white`}
+      >
+        {loading ? (
+          <span className="flex items-center">
+            <svg
+              className="animate-spin h-5 w-5 mr-2 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              ></path>
+            </svg>
+            {fileReady ? 'Downloading...' : 'Generating...'}
+          </span>
+        ) : (
+          buttonLabel
+        )}
+      </button>
+    </div>
       <div className="mb-4">
         <label className="text-sm font-semibold">Read Progress</label>
         <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -260,7 +286,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
                       className={`text-sm mr-2 px-2 py-1 rounded ${selectedQuestions.has(qa.id) ? 'bg-blue-500 text-white' : 'bg-gray-500 text-white'
                         }`}
                     >
-                      {selectedQuestions.has(qa.id) ? 'Added' : 'Add to PDF'}
+                      {selectedQuestions.has(qa.id) ? 'Remove from PDF' : 'Add to PDF'}
                     </button>
                     <input
                       type="checkbox"
