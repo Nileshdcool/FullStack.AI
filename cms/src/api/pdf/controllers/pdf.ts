@@ -196,7 +196,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         displayHeaderFooter: true,
         headerTemplate: `<div style="font-size: 13px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;margin-bottom: 12px;">Elevar.AI - Kill Your Interview</div>`,
         footerTemplate: `<div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
-        margin: { top: '40px', bottom: '80px', left: '50px', right: '50px' },
+        margin: { top: '40px', bottom: '80px', left: '25px', right: '25px' },
       });
 
       await browser.close();
