@@ -86,13 +86,15 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
     margin-bottom: 20px;
     color: #222;
   }
-  .topic-name {
-    font-size: 20px;
+    .topic-name {
+    font-size: 30px;
     font-weight: normal;
     text-align: center;
-    margin-bottom: 20px; 
+    margin-top: 16px; /* Added space to the top */
+    margin-bottom: 7px; /* Keeps bottom spacing compact */
     color: #333;
   }
+
   .watermark {
     position: fixed;
     top: 0;
@@ -165,13 +167,13 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
               <div class="question">
                 <div class="question-title">Q${i + 1}: ${q.Content}</div>
                 ${q.answers.length > 1
-                  ? q.answers.map((a, j) => `
+          ? q.answers.map((a, j) => `
                     <div class="answer">
                       <strong>Answer ${j + 1}:</strong>
                       <div>${a.content}</div>
                     </div>
                   `).join('')
-                  : `
+          : `
                     <div class="answer">
                       <strong>Answer:</strong>
                       <div>${q.answers[0]?.content}</div>
@@ -192,7 +194,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         printBackground: true,
         format: 'A4',
         displayHeaderFooter: true,
-        headerTemplate: `<div style="font-size: 16px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;">Elevar.AI - Kill Your Interview</div>`,
+        headerTemplate: `<div style="font-size: 13px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;margin-bottom: 12px;">Elevar.AI - Kill Your Interview</div>`,
         footerTemplate: `<div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
         margin: { top: '40px', bottom: '80px', left: '50px', right: '50px' },
       });

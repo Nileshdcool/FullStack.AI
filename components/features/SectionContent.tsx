@@ -214,9 +214,6 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
 
   return (
     <div className="my-8 border border-gray-300 p-4">
-      {filteredQaList.length > 0 && (
-        <h3 className="text-xl mb-2">Top {filteredQaList.length} Interview Questions</h3>
-      )}
      <div className="mb-4 flex justify-end">
       <button
         disabled={selectedQuestions.size === 0 && !fileReady || loading}
