@@ -70,94 +70,92 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         <!DOCTYPE html>
         <html>
         <head>
-          <style>
-            body {
-              font-family: Georgia;
-              margin: 0;
-              padding: 0;
-              line-height: 1.5;
-              padding-top: 50px;
-            }
-            .heading {
-              font-size: 12px;
-              font-weight: bold;
-              text-align: center;
-              margin-top: 50px;
-              margin-bottom: 20px;
-              color: #222;
-            }
-            .topic-name {
-              font-size: 20px;
-              font-weight: normal;
-              text-align: center;
-              margin-bottom: 30px;
-              color: #333;
-            }
-            .watermark {
-              position: fixed;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              z-index: 9999;
-              pointer-events: none;
-              transform: rotate(-45deg);
-              font-size: 60px;
-              font-weight: bold;
-              color: rgba(50, 50, 50, 0.5);
-            }
-            .question {
-              margin-bottom: 30px;
-              page-break-inside: avoid;
-            }
-            .question.new-page {
-              page-break-before: always;
-            }
-            .question-title {
-              font-size: 20px;
-              font-weight: bold;
-              color: #333;
-              margin-bottom: 10px;
-              border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-              padding-bottom: 5px;
-            }
-            .answer {
-              font-size: 14px;
-              margin-left: 20px;
-              margin-bottom: 10px;
-              color: #555;
-              background-color: rgba(229, 231, 235, 0.8);
-              padding: 10px;
-              border-radius: 5px;
-              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-            .answer strong {
-              font-size: 16px;
-              font-weight: bold;
-              color: #333;
-            }
-            .page {
-              page-break-inside: avoid;
-              margin-bottom: 40px;
-              padding-left: 50px;
-              padding-right: 50px;
-            }
-            @media print {
-              body {
-                margin: 0;
-                padding: 0;
-              }
-              .watermark {
-                display: none;
-              }
-              .page {
-                margin-bottom: 60px;
-              }
-            }
-          </style>
+        <style>
+  body {
+    font-family: Georgia;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+    padding-top: 50px;
+  }
+  .heading {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    color: #222;
+  }
+  .topic-name {
+    font-size: 20px;
+    font-weight: normal;
+    text-align: center;
+    margin-bottom: 20px; 
+    color: #333;
+  }
+  .watermark {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    pointer-events: none;
+    transform: rotate(-45deg);
+    font-size: 60px;
+    font-weight: bold;
+    color: rgba(50, 50, 50, 0.5);
+  }
+  .question {
+    margin-bottom: 5px;
+    page-break-inside: avoid;
+  }
+  .question.new-page {
+    page-break-before: always;
+  }
+  .question-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 5px;
+  }
+  .answer {
+    font-size: 14px;
+    margin-left: 20px;
+    margin-bottom: 5px; 
+    color: #555;
+    background-color: rgba(229, 231, 235, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  .answer strong {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+  .page {
+    page-break-inside: avoid;
+    margin-bottom: 30px; 
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+  @media print {
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .page {
+      margin-bottom: 40px; 
+    }
+  }
+</style>
+
         </head>
         <body>
           ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''}

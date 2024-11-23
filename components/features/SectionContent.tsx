@@ -31,6 +31,9 @@ const sortQuestionsByLevel = (questions: Question[]) => {
   });
 };
 
+const sortQuestionsForUnsubscribed = (questions: Question[]) => {
+  return questions.sort((a, b) => a.id - b.id);
+};
 
 export function QuestionAnswerContent({ filteredQaList, topicName }: SectionContentProps) {
   debugger;
@@ -51,6 +54,8 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
       setSelectedTopicName(topicName);
     }
     const sortedQuestions = sortQuestionsByLevel(filteredQaList);
+
+    filteredQaList = isSubscribed ? sortQuestionsByLevel(filteredQaList) : sortQuestionsForUnsubscribed(filteredQaList);
     const initialReadStatuses: { [key: number]: boolean } = {};
     const initialStatusIds: { [key: number]: string } = {}; // Adjust type based on `statusId` type
 
@@ -258,7 +263,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
         <p className="text-xs text-gray-500 mt-1">{Math.round(calculateProgress())}% Complete</p>
       </div>
       <div className="space-y-4">
-        {sortQuestionsByLevel(filteredQaList).map((qa, index) => (
+        {filteredQaList.map((qa, index) => (
           <div
             key={qa.id}
             className={`bg-gray-100 p-4 rounded shadow-md ${!isSubscribed && index > freeQuestiontoRead ? 'pointer-events-none' : ''}`}
