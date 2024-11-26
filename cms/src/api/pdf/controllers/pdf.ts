@@ -1,8 +1,8 @@
 import { factories } from '@strapi/strapi';
 import { sendMessage } from '../services/websocket';
 const puppeteer = require('puppeteer');
-import path from "path";
-import fs from "fs";
+import path from 'path';
+import fs from 'fs';
 
 // Define interfaces for Answer and Question
 interface Answer {
@@ -23,28 +23,32 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         ? ctx.request.headers['x-user-email'][0]
         : ctx.request.headers['x-user-email'];
 
-      let selectedQuestions = ctx.request.body?.selectedQuestions || [];
+      const sessionKey = ctx.request.body?.sessionKey || userId;
+
+      if (!sessionKey) {
+        return ctx.throw(400, 'Session key is missing');
+      }
+
+      const selectedQuestions = ctx.request.body?.selectedQuestions || [];
       const fileName = ctx.request.body?.fileName;
       const topicName = ctx.request.body?.topicName;
 
+      if (!selectedQuestions.length || !fileName || !topicName) {
+        return ctx.throw(400, 'Missing required parameters');
+      }
+
       const projectRoot = path.resolve(__dirname); // The directory of the current file
-      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, "storage", "pdfs");
+      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, 'storage', 'pdfs');
 
       // Ensure the directory exists
       if (!fs.existsSync(storagePath)) {
-        fs.mkdirSync(storagePath, { recursive: true }); // Create directory if it doesn't exist
+        fs.mkdirSync(storagePath, { recursive: true });
       }
 
-      const pdfStoragePath = process.env.PDF_STORAGE_PATH || storagePath;
+      const filePath = `${storagePath}/${fileName}`;
 
-
-      if (!fs.existsSync(pdfStoragePath)) {
-        fs.mkdirSync(pdfStoragePath, { recursive: true });
-      }
-      const filePath = `${pdfStoragePath}/${fileName}`;
-      if (userId) {
-        sendMessage(userId, { status: 'in-progress', message: 'PDF generation started' });
-      }
+      // Notify client that PDF generation has started
+      sendMessage(sessionKey, { status: 'in-progress', message: 'PDF generation started' });
 
       const questionsResponse = await strapi.entityService.findMany('api::question.question', {
         filters: { id: { $in: selectedQuestions } },
@@ -63,174 +67,168 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0);
 
       const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        body {
-            font-family: Georgia;
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
-            padding-top: 50px;
-        }
-        .heading {
-          font-size: 12px;
-          font-weight: bold;
-          text-align: center;
-          margin-top: 50px;
-          margin-bottom: 20px;
-          color: #222;
-        }
-        .topic-name {
-          font-size: 20px;
-          font-weight: normal;
-          text-align: center;
-          margin-bottom: 30px;
-          color: #333;
-        }
-        .watermark {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: -1;
-          pointer-events: none;
-          transform: rotate(-45deg);
-          font-size: 60px;
-          font-weight: bold;
-          color: rgba(50, 50, 50, 0.5);
-        }
-        .question {
-          margin-bottom: 30px;
-          page-break-inside: avoid;
-        }
-        .question.new-page {
-          page-break-before: always;
-        }
-        .question-title {
-          font-size: 16px;
-          font-weight: bold;
-          color: #333;
-          margin-bottom: 10px;
-        }
-        .answer {
-          font-size: 14px;
-          margin-left: 20px;
-          margin-bottom: 10px;
-          color: #555;
-        }
-        .page {
-          page-break-inside: avoid;
-          margin-bottom: 20px;
-          padding-left: 50px;
-          padding-right: 50px;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="watermark">Elevar.AI</div>
-     <div class="topic-name" style="margin-top: 0;">
-      ${topicName}
-    </div>
-      ${filteredQuestions
-          .map((q, i) => {
-            const shouldForceNewPage = q.answers.some((a) => a.content.length > 500);
-            return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <style>
+  body {
+    font-family: Georgia;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+    padding-top: 50px;
+  }
+  .heading {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    color: #222;
+  }
+    .topic-name {
+    font-size: 30px;
+    font-weight: normal;
+    text-align: center;
+    margin-top: 16px; /* Added space to the top */
+    margin-bottom: 7px; /* Keeps bottom spacing compact */
+    color: #333;
+  }
+
+  .watermark {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    pointer-events: none;
+    transform: rotate(-45deg);
+    font-size: 60px;
+    font-weight: bold;
+    color: rgba(50, 50, 50, 0.5);
+  }
+  .question {
+    margin-bottom: 5px;
+    page-break-inside: avoid;
+  }
+  .question.new-page {
+    page-break-before: always;
+  }
+ .question-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-left: 10px; /* Align with answer margin */
+}
+
+.answer {
+  font-size: 14px;
+  margin-left: 10px; /* Ensures the same margin as question */
+  margin-bottom: 5px; 
+  color: #555;
+  background-color: rgba(229, 231, 235, 0.8);
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+  .answer strong {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+  .page {
+    page-break-inside: avoid;
+    margin-bottom: 30px; 
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+  @media print {
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    .page {
+      margin-bottom: 40px; 
+    }
+  }
+</style>
+
+        </head>
+        <body>
+          ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''}
+          <div class="topic-name">${topicName}</div>
+          ${filteredQuestions.map((q, i) => `
             <div class="page">
-              <div class="question ${shouldForceNewPage ? 'new-page' : ''}">
+              <div class="question">
                 <div class="question-title">Q${i + 1}: ${q.Content}</div>
                 ${q.answers.length > 1
-                ? q.answers
-                  .map((a, j) => `
+          ? q.answers.map((a, j) => `
                     <div class="answer">
                       <strong>Answer ${j + 1}:</strong>
                       <div>${a.content}</div>
                     </div>
-                    <br/>
-                  `)
-                  .join('')
-                : `
+                  `).join('')
+          : `
                     <div class="answer">
                       <strong>Answer:</strong>
                       <div>${q.answers[0]?.content}</div>
                     </div>
-                    <br/>
-                  `
-              }
+                  `}
               </div>
             </div>
-          `;
-          })
-          .join('')}
-    </body>
-    </html>
-          `;
+          `).join('')}
+        </body>
+        </html>
+      `;
 
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.setContent(htmlContent);
 
-      await page.addStyleTag({
-        content: `
-          @page {
-            margin-bottom: 0;
-          }
-          .date-time {
-            display: none !important;
-          }
-        `,
-      });
-
       const pdfBuffer = await page.pdf({
+        printBackground: true,
         format: 'A4',
         displayHeaderFooter: true,
-        headerTemplate: `
-    <div style="font-size: 16px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;">
-      Elevar.AI - Kill Your Interview
-    </div>`,
-        footerTemplate: `
-    <div style="font-size: 10px; text-align: center; width: 100%; padding: 10px 0;">
-      <span class="pageNumber"></span> / <span class="totalPages"></span>
-    </div>`,
-        margin: { top: '40px', bottom: '50px', left: '50px', right: '50px' }, // Increase top margin if needed
+        headerTemplate: `<div style="font-size: 13px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;margin-bottom: 12px;">Elevar.AI - Kill Your Interview</div>`,
+        footerTemplate: `<div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
+        margin: { top: '40px', bottom: '80px', left: '10px', right: '10px' },
       });
 
-
       await browser.close();
-        fs.writeFileSync(filePath, pdfBuffer);
-        if (userId) {
-          sendMessage(userId, { status: 'completed', message: 'PDF generated successfully', filePath });
-        }
+      fs.writeFileSync(filePath, pdfBuffer);
+
+      if (sessionKey) {
+        // Notify client that the PDF generation is completed
+        sendMessage(sessionKey, { status: 'completed', message: 'PDF generated successfully', filePath });
+      }
       ctx.body = { message: 'PDF generation started' };
-    } catch (error:any) {
-      ctx.throw(500, `Failed to generate PDF: ${error.error}`);
+    } catch (error) {
+      ctx.throw(500, `Failed to generate PDF: ${error.message}`);
     }
   },
+
   async downloadPdf(ctx) {
     try {
-
       const fileName = ctx.request.body?.fileName;
-      const projectRoot = path.resolve(__dirname); 
-      const storagePath = process.env.PDF_STORAGE_PATH || path.join(projectRoot, "storage", "pdfs");
-      const pdfStoragePath = process.env.PDF_STORAGE_PATH || storagePath;
-      const filePath = `${pdfStoragePath}/${fileName}`;
-      // Check if the file exists
+      const storagePath = process.env.PDF_STORAGE_PATH || path.join(path.resolve(__dirname), 'storage', 'pdfs');
+      const filePath = `${storagePath}/${fileName}`;
+
       if (!fs.existsSync(filePath)) {
         ctx.throw(404, 'File not found');
       }
 
-      // Set headers for the file download
       ctx.set('Content-Type', 'application/pdf');
-      ctx.set('Content-Disposition', `attachment; filename="generated-SachinBangar.pdf"`);
+      ctx.set('Content-Disposition', `attachment; filename="${fileName}"`);
 
-      // Stream the file to the response body
       ctx.body = fs.createReadStream(filePath);
-
     } catch (error) {
       console.error('Error downloading PDF:', error);
       ctx.throw(500, 'Error downloading PDF');

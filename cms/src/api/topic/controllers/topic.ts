@@ -1,4 +1,5 @@
 import { factories } from '@strapi/strapi';
+import { freeQuestiontoRead } from '../../../../config/constants';
 
 interface TopicWithQuestions {
   questions: Array<{
@@ -61,10 +62,10 @@ export default factories.createCoreController('api::topic.topic', ({ strapi }) =
       });
 
       // Modify questions based on subscription status
-      if (!isSubscribed && topicWithQuestions.questions && topicWithQuestions.questions.length > 1) {
+      if (!isSubscribed && topicWithQuestions.questions && topicWithQuestions.questions.length > freeQuestiontoRead) {
         topicWithQuestions.questions = topicWithQuestions.questions.map((question, index) => {
-          if (index === 0) {
-            return question; // Keep the first question with answers
+          if (index < freeQuestiontoRead) {
+            return question; // Keep answers for the top 5 questions
           } else {
             return { ...question, answers: [] }; // Omit answers for other questions
           }
