@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "install:all": "concurrently \"pnpm install --prefix cms\" \"pnpm install --prefix .\"",
+    "dev:concurrently": "concurrently \"npm run develop --prefix cms\" \"npm run dev --prefix .\"",
+    "build:concurrently": "concurrently \"npm run build --prefix cms\" \"npm run build --prefix .\"",
+    "start:concurrently": "concurrently \"npm run start --prefix cms\" \"npm run start --prefix .\"",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -28,6 +32,7 @@
     "react-slidedown": "^2.4.7",
     "react-toastify": "^10.0.5",
     "socket.io-client": "^4.8.1",
+    "strapi-sdk-js": "^2.3.3",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
@@ -36,6 +41,7 @@
     "@types/react-dom": "^18",
     "@types/react-icons": "^3.0.0",
     "@types/react-modal": "^3.16.3",
+    "concurrently": "^9.1.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
     "postcss": "^8",

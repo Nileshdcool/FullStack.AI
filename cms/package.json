@@ -31,10 +31,12 @@
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
+    "@types/koa": "^2.15.0",
     "@types/node": "^20",
     "@types/puppeteer": "^5.4.7",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "koa": "^2.13.4",
     "typescript": "^5"
   },
   "engines": {
