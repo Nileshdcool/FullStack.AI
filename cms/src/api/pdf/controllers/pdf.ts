@@ -118,24 +118,27 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
   .question.new-page {
     page-break-before: always;
   }
-  .question-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    padding-bottom: 5px;
-  }
-  .answer {
-    font-size: 14px;
-    margin-left: 20px;
-    margin-bottom: 5px; 
-    color: #555;
-    background-color: rgba(229, 231, 235, 0.8);
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
+ .question-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-left: 10px; /* Align with answer margin */
+}
+
+.answer {
+  font-size: 14px;
+  margin-left: 10px; /* Ensures the same margin as question */
+  margin-bottom: 5px; 
+  color: #555;
+  background-color: rgba(229, 231, 235, 0.8);
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
   .answer strong {
     font-size: 16px;
     font-weight: bold;
@@ -196,7 +199,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         displayHeaderFooter: true,
         headerTemplate: `<div style="font-size: 13px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;margin-bottom: 12px;">Elevar.AI - Kill Your Interview</div>`,
         footerTemplate: `<div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
-        margin: { top: '40px', bottom: '80px', left: '25px', right: '25px' },
+        margin: { top: '40px', bottom: '80px', left: '10px', right: '10px' },
       });
 
       await browser.close();
