@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - BACKEND_URL=http://backend:1337
+    depends_on:
+      - backend
+
+  backend:
+    image: strapi/strapi
+    ports:
+      - "1337:1337"
+    environment:
+      - DATABASE_CLIENT=sqlite
+      - DATABASE_FILENAME=/data/data.db
+      - HOST=0.0.0.0
+      - PORT=1337
+    volumes:
+      - ./cms:/srv/app
+      - ./cms/.tmp:/data
