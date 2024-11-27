@@ -1,8 +1,13 @@
 import { factories } from '@strapi/strapi';
 import { sendMessage } from '../services/websocket';
-const puppeteer = require('puppeteer');
+import puppeteer from 'puppeteer';
 import path from 'path';
 import fs from 'fs';
+import hljs from 'highlight.js';
+
+const cssPath = "C:/sbangar/workspace/FullstackAI/FullStack.AI/cms/node_modules/highlight.js/styles/atom-one-dark.css"
+const highlightCss = fs.readFileSync(cssPath, 'utf-8');
+
 
 // Define interfaces for Answer and Question
 interface Answer {
@@ -66,128 +71,98 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
 
       const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0);
 
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <style>
-  body {
-    font-family: Georgia;
-    margin: 0;
-    padding: 0;
-    line-height: 1.5;
-    padding-top: 50px;
-  }
-  .heading {
-    font-size: 12px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 50px;
-    margin-bottom: 20px;
-    color: #222;
-  }
-    .topic-name {
-    font-size: 30px;
-    font-weight: normal;
-    text-align: center;
-    margin-top: 16px; /* Added space to the top */
-    margin-bottom: 7px; /* Keeps bottom spacing compact */
-    color: #333;
-  }
-
-  .watermark {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    pointer-events: none;
-    transform: rotate(-45deg);
-    font-size: 60px;
-    font-weight: bold;
-    color: rgba(50, 50, 50, 0.5);
-  }
-  .question {
-    margin-bottom: 5px;
-    page-break-inside: avoid;
-  }
-  .question.new-page {
-    page-break-before: always;
-  }
- .question-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 5px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  margin-left: 10px; /* Align with answer margin */
-}
-
-.answer {
-  font-size: 14px;
-  margin-left: 10px; /* Ensures the same margin as question */
-  margin-bottom: 5px; 
-  color: #555;
-  background-color: rgba(229, 231, 235, 0.8);
-  padding: 5px;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-  .answer strong {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-  }
-  .page {
-    page-break-inside: avoid;
-    margin-bottom: 30px; 
-    padding-left: 50px;
-    padding-right: 50px;
-  }
-  @media print {
+   const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    ${highlightCss}  
+  </style>
+  <style>
     body {
+      font-family: Georgia, serif;
       margin: 0;
       padding: 0;
+      line-height: 1.5;
+      padding-top: 50px;
     }
-    .page {
-      margin-bottom: 40px; 
+    .topic-name {
+      font-size: 30px;
+      font-weight: normal;
+      text-align: center;
+      margin-top: 16px;
+      margin-bottom: 7px;
+      color: #333;
     }
-  }
-</style>
+    .question {
+      margin-bottom: 15px;
+      page-break-inside: avoid;
+    }
+    .question-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .answer {
+      font-size: 14px;
+      margin-left: 10px;
+      margin-bottom: 10px;
+      color: #555;
+      background-color: rgba(229, 231, 235, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    pre {
+      background: #272822;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    code {
+      font-family: 'Courier New', Courier, monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="topic-name">${topicName}</div>
+  ${filteredQuestions
+    .map(
+      (q, i) => `
+      <div class="question">
+        <div class="question-title">Q${i + 1}: ${q.Content}</div>
+        ${q.answers
+          .map((a, j) => {
+            const contentParts = a.content.split('```');
+            const formattedAnswer = contentParts
+              .map((part, index) =>
+                index % 2 === 0
+                  ? `<div>${part}</div>` // Regular text
+                  : `<pre><code>${hljs.highlightAuto(part).value}</code></pre>` // Code block
+              )
+              .join('');
 
-        </head>
-        <body>
-          ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''}
-          <div class="topic-name">${topicName}</div>
-          ${filteredQuestions.map((q, i) => `
-            <div class="page">
-              <div class="question">
-                <div class="question-title">Q${i + 1}: ${q.Content}</div>
-                ${q.answers.length > 1
-          ? q.answers.map((a, j) => `
-                    <div class="answer">
-                      <strong>Answer ${j + 1}:</strong>
-                      <div>${a.content}</div>
-                    </div>
-                  `).join('')
-          : `
-                    <div class="answer">
-                      <strong>Answer:</strong>
-                      <div>${q.answers[0]?.content}</div>
-                    </div>
-                  `}
+            return `
+              <div class="answer">
+                <strong>Answer ${j + 1}:</strong>
+                ${formattedAnswer}
               </div>
-            </div>
-          `).join('')}
-        </body>
-        </html>
-      `;
+            `;
+          })
+          .join('')}
+      </div>
+    `
+    )
+    .join('')}
+</body>
+</html>
+`;
 
       const browser = await puppeteer.launch();
       const page = await browser.newPage();

@@ -20,8 +20,10 @@
     "express": "^4.21.1",
     "firebase-admin": "^12.6.0",
     "fs-extra": "^10.0.0",
+    "highlight.js": "^11.10.0",
     "koa-bodyparser": "^4.4.1",
     "mime-types": "^2.1.27",
+    "prismjs": "^1.29.0",
     "puppeteer": "^23.8.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -33,9 +35,12 @@
   "devDependencies": {
     "@types/koa": "^2.15.0",
     "@types/node": "^20",
+    "@types/prismjs": "^1.26.5",
     "@types/puppeteer": "^5.4.7",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
     "koa": "^2.13.4",
     "typescript": "^5"
   },
