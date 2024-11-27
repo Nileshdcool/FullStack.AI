@@ -84,14 +84,15 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       margin: 0;
       padding: 0;
       line-height: 1.5;
-      padding-top: 50px;
+      // padding-top: 50px;
     }
     .topic-name {
       font-size: 30px;
       font-weight: normal;
       text-align: center;
-      margin-top: 16px;
-      margin-bottom: 7px;
+      margin-top: 7px; /* Set to 0 or reduce */
+      margin-bottom: 7px; /* Keep it minimal */
+      padding-top: 0; /* Remove unnecessary padding */
       color: #333;
     }
     .question {
@@ -172,10 +173,12 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         printBackground: true,
         format: 'A4',
         displayHeaderFooter: true,
-        headerTemplate: `<div style="font-size: 13px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;margin-bottom: 12px;">Elevar.AI - Kill Your Interview</div>`,
+        headerTemplate: `<div style="font-size: 13px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;margin-bottom: 5px;">Elevar.AI - Kill Your Interview</div>`,
         footerTemplate: `<div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
-        margin: { top: '40px', bottom: '80px', left: '10px', right: '10px' },
-      });
+        margin: { top: '40px', bottom: '80px', left: '40px', right: '40px' },
+
+    });
+    
 
       await browser.close();
       fs.writeFileSync(filePath, pdfBuffer);
