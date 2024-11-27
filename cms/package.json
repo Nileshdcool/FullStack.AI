@@ -4,6 +4,7 @@
   "private": true,
   "description": "A Strapi application",
   "scripts": {
+    "debug": "pnpm run develop -- --debug",
     "build": "strapi build",
     "deploy": "strapi deploy",
     "develop": "strapi develop",
@@ -13,10 +14,12 @@
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.0.3",
+    "@strapi/plugin-email": "^4.25.12",
     "@strapi/plugin-users-permissions": "5.0.3",
     "@strapi/strapi": "5.0.3",
     "@strapi/utils": "^5.1.1",
     "better-sqlite3": "9.4.3",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "firebase-admin": "^12.6.0",
     "fs-extra": "^10.0.0",

@@ -39,7 +39,9 @@ export const httpRequest = async <T>(endpoint: string, options: ApiOptions): Pro
 
     try {
         const response: AxiosResponse<T> = await axios(config);
+        console.log("Response:", response.data);
         return response.data;
+        
     } catch (error: any) {
         if (error.response) {
         throw new Error(`Error: ${error.response.status} ${error.response.statusText}`);

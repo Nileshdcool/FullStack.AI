@@ -211,7 +211,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       }
       ctx.body = { message: 'PDF generation started' };
     } catch (error) {
-      ctx.throw(500, `Failed to generate PDF: ${error.message}`);
+      ctx.throw(500, `Failed to generate PDF: ${error}`);
     }
   },
 

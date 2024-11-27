@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["node_modules/@types"],
     "module": "CommonJS",
     "moduleResolution": "Node",
     "lib": ["ES2020","esnext", "dom"],

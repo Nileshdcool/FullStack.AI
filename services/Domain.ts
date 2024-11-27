@@ -25,6 +25,7 @@ export const getIndustrySectionTopicData = async () => {
         const res = await httpRequest<{ results: any[] }>('/api/industries-with-sections-and-topics', {
             method: HttpMethod.GET,
         });
+        console.log(res);
         return res;
     } catch (error) {
         throw error;

@@ -12,7 +12,7 @@ export default [
                 directives: {
                     'script-src': ["'self'", "'unsafe-inline'", 'cdn.jsdelivr.net'],
                     'img-src': ["'self'", 'data:', 'blob:', 'cdn.jsdelivr.net'],
-                    'connect-src': ["'self'", 'http:'], // Adjust based on your backend setup
+                    'connect-src': ["'self'", 'http:', 'localhost'], // Adjust based on your backend setup
                 },
             },
         },
