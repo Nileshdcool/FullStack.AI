@@ -12,8 +12,6 @@ import { apiURL, freeQuestiontoRead } from '@/helper/constants';
 import { toast } from 'react-toastify';
 import { getSessionKey } from '@/helper/sessionKey';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-//import { SyntaxHighlighter  } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-// const {  SyntaxHighlighter } = require('react-syntax-highlighter/dist/cjs/styles/prism');
  import { okaidia } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 
