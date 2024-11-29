@@ -4,11 +4,7 @@ import puppeteer from 'puppeteer';
 import path from 'path';
 import fs from 'fs';
 import hljs from 'highlight.js';
-
-const cssPath = "C:/sbangar/workspace/FullstackAI/FullStack.AI/cms/node_modules/highlight.js/styles/atom-one-dark.css"
-const highlightCss = fs.readFileSync(cssPath, 'utf-8');
-
-
+import axios from 'axios';
 // Define interfaces for Answer and Question
 interface Answer {
   id: number;
@@ -24,6 +20,10 @@ interface Question {
 export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
   async generatePdf(ctx) {
     try {
+
+      const highlightJsCssUrl = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/atom-one-dark.min.css";
+      const highlightCss = await axios.get(highlightJsCssUrl).then(response => response.data);
+
       const userId = Array.isArray(ctx.request.headers['x-user-email'])
         ? ctx.request.headers['x-user-email'][0]
         : ctx.request.headers['x-user-email'];
@@ -71,100 +71,101 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
 
       const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0);
 
-   const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    ${highlightCss}  
-  </style>
-  <style>
-    body {
-      font-family: Georgia, serif;
-      margin: 0;
-      padding: 0;
-      line-height: 1.5;
-      // padding-top: 50px;
-    }
-    .topic-name {
-      font-size: 30px;
-      font-weight: normal;
-      text-align: center;
-      margin-top: 7px; /* Set to 0 or reduce */
-      margin-bottom: 7px; /* Keep it minimal */
-      padding-top: 0; /* Remove unnecessary padding */
-      color: #333;
-    }
-    .question {
-      margin-bottom: 15px;
-      page-break-inside: avoid;
-    }
-    .question-title {
-      font-size: 20px;
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 5px;
-      padding-bottom: 5px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    .answer {
-      font-size: 14px;
-      margin-left: 10px;
-      margin-bottom: 10px;
-      color: #555;
-      background-color: rgba(229, 231, 235, 0.8);
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    pre {
-      background: #272822;
-      color: #f8f8f2;
-      padding: 15px;
-      border-radius: 5px;
-      overflow-x: auto;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    code {
-      font-family: 'Courier New', Courier, monospace;
-    }
-  </style>
-</head>
-<body>
-  <div class="topic-name">${topicName}</div>
-  ${filteredQuestions
-    .map(
-      (q, i) => `
-      <div class="question">
-        <div class="question-title">Q${i + 1}: ${q.Content}</div>
-        ${q.answers
-          .map((a, j) => {
-            const contentParts = a.content.split('```');
-            const formattedAnswer = contentParts
-              .map((part, index) =>
-                index % 2 === 0
-                  ? `<div>${part}</div>` // Regular text
-                  : `<pre><code>${hljs.highlightAuto(part).value}</code></pre>` // Code block
-              )
-              .join('');
-
-            return `
-              <div class="answer">
-                <strong>Answer ${j + 1}:</strong>
-                ${formattedAnswer}
-              </div>
-            `;
-          })
+      const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          ${highlightCss}  
+        </style>
+        <style>
+          body {
+            font-family: Georgia, serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+          }
+          .topic-name {
+            font-size: 30px;
+            font-weight: normal;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 15px; /* Adjust to match with question section */
+            padding-top: 0;
+            color: #333;
+          }
+          .question {
+            margin-top: 0;
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+          }
+          .question-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-left: 10px;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          }
+          .answer {
+            font-size: 14px;
+            margin-left: 10px;
+            margin-bottom: 10px;
+            color: #555;
+            background-color: rgba(229, 231, 235, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          }
+          pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+          }
+          code {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 700; /* Add this to adjust the font weight */
+          }
+        </style>
+      </head>
+      <body>
+        <div class="topic-name">${topicName}</div>
+        ${filteredQuestions
+          .map(
+            (q, i) => `
+            <div class="question">
+              <div class="question-title">Q${i + 1}: ${q.Content}</div>
+              ${q.answers
+                .map((a, j) => {
+                  const contentParts = a.content.split('```');
+                  const formattedAnswer = contentParts
+                    .map((part, index) =>
+                      index % 2 === 0
+                        ? `<div>${part}</div>` 
+                        : `<pre><code>${hljs.highlightAuto(part).value}</code></pre>` 
+                    )
+                    .join('');
+                  return `
+                    <div class="answer">
+                      <strong>Answer ${j + 1}:</strong>
+                      ${formattedAnswer}
+                    </div>
+                  `;
+                })
+                .join('')}
+            </div>
+          `
+          )
           .join('')}
-      </div>
-    `
-    )
-    .join('')}
-</body>
-</html>
-`;
-
+      </body>
+      </html>
+      `;
+      
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.setContent(htmlContent);
