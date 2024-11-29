@@ -94,7 +94,23 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
             padding-top: 0;
             color: #333;
           }
-          .question {
+        .watermark {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+          pointer-events: none;
+          transform: rotate(-45deg);
+          font-size: 60px;
+          font-weight: bold;
+          color: rgba(50, 50, 50, 0.5);
+        }
+        .question {
             margin-top: 0;
             margin-bottom: 15px;
             page-break-inside: avoid;
@@ -134,6 +150,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         </style>
       </head>
       <body>
+       ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''}
         <div class="topic-name">${topicName}</div>
         ${filteredQuestions
           .map(
