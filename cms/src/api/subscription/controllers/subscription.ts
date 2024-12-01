@@ -25,8 +25,11 @@ export default factories.createCoreController('api::subscription.subscription', 
             filters.StripePaymentID = StripePaymentID; // Assuming this is the field name for the subscription type
         }
 
+        const sort = [{ EndDate: 'desc' }];
+
         // Call the default find method with filters
-        const subscriptions = await strapi.service('api::subscription.subscription').find({ filters });
+        const subscriptions = await strapi.service('api::subscription.subscription').find({ filters,
+            sort });
 
         return subscriptions;
     },
