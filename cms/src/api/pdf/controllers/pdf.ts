@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import hljs from 'highlight.js';
 import axios from 'axios';
+import { questionAnswerPrimaryFont, questionAnswerSecondaryFont } from '../../../../config/constants';
 // Define interfaces for Answer and Question
 interface Answer {
   id: number;
@@ -80,7 +81,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         </style>
         <style>
           body {
-            font-family: Georgia, serif;
+            font-family: ${questionAnswerPrimaryFont}, ${questionAnswerSecondaryFont};
             margin: 0;
             padding: 0;
             line-height: 1.5;

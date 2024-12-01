@@ -8,11 +8,12 @@ import axios from 'axios';
 import { connectWebSocket, disconnectWebSocket } from '@/utils/websocket';
 import { HttpMethod, WebSocketStatus } from '@/helper/enums';
 import { httpRequest } from '@/helper/apiService';
-import { apiURL, freeQuestiontoRead } from '@/helper/constants';
+import { apiURL, freeQuestiontoRead, questionAnswerLowPrioriryFont, questionAnswerPrimaryFont, questionAnswerSecondaryFont } from '@/helper/constants';
 import { toast } from 'react-toastify';
 import { getSessionKey } from '@/helper/sessionKey';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
- import { okaidia } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { okaidia } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { FontToRead } from '@/helper/enums';
 
 
 const BASE_URL = process.env.REACT_APP_API_URL || apiURL;
@@ -48,9 +49,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
   const [buttonLabel, setButtonLabel] = useState<string>('Generate PDF');
   const [selectedTopicName, setSelectedTopicName] = useState<string>('Generate PDF');
   const [loading, setLoading] = useState(false); // Loading state
-
-
-
+  const [selectedFont, setSelectedFont] = useState<FontToRead>(questionAnswerPrimaryFont);
 
   useEffect(() => {
 
@@ -270,6 +269,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
           >
             <summary
               className="cursor-pointer font-semibold flex items-center justify-between"
+              style={{ fontFamily: `${selectedFont}, ${questionAnswerSecondaryFont}, ${questionAnswerLowPrioriryFont}` }}
               onClick={() => toggleQuestion(qa.id)}
             >
               <span className="text-lg text-gray-600">
@@ -317,7 +317,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
                 className={`mt-2 p-3 rounded ${answerIndex % 2 === 0 ? 'bg-gray-200' : 'bg-gray-300'}`}
               >
                 {qa.answers.length > 1 && (
-                  <span className="font-semibold text-sm">Answer {answerIndex + 1}:</span>
+                  <span className="text-sm"  style={{ fontFamily: selectedFont }}>Answer {answerIndex + 1}:</span>
                 )}
 
                 {/* Render answer content with syntax highlighting for code blocks */}
