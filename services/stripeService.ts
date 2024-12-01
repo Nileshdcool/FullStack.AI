@@ -61,7 +61,6 @@ export const getSubscriptionByUserId = async (userEmail: string) => {
         const res = await httpRequest<{ results: any[] }>('/api/subscriptions?user=' + userEmail, {
             method: HttpMethod.GET,
         });
-        debugger;
         if(res.results.length == 0)
             return false;
 
