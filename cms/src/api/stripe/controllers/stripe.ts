@@ -1,10 +1,11 @@
 import Stripe from 'stripe';
 import { Context } from 'koa'; // Import the context type from Koa
+import { FRONTEND_URL } from '../../../../config/constants';
 
 
 // Your Stripe Secret Key
 const secretKey = process.env.REACT_APP_STRIPE_SECRET_KEY;
-const baseUrl = process.env.REACT_APP_BASE_URL;
+const baseUrl = FRONTEND_URL;
 
 // Ensure the secret key is defined
 if (!secretKey) {

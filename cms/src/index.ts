@@ -1,5 +1,6 @@
 import { Server as HttpServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import { FRONTEND_URL } from '../config/constants';
 
 interface ClientMap {
   [userId: string]: string; // Map userId to socket.id
@@ -25,7 +26,7 @@ export default {
     const httpServer: HttpServer = strapi.server.httpServer;
     io = new SocketIOServer(httpServer, {
       cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Frontend URL
+        origin: FRONTEND_URL,
         credentials: true,
       },
     });

@@ -5,6 +5,7 @@ import { getAuth, signOut, User } from "firebase/auth"; // Import signOut from F
 import { getSubscriptionByUserId } from '@/services/stripeService';
 import { updateLogoutTime } from '@/services/loginHistory';
 import { clearSession } from '@/firebasedetails/firebaseAuth';
+import { FRONTEND_URL } from '@/helper/constants';
 
 interface AppContextProps {
     isSidebarCollapsed: boolean;    
@@ -89,7 +90,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             }
             const sessionKey = getSessionKey(user);
             localStorage.removeItem(sessionKey);
-            window.location.href =   process.env.FRONTEND_URL || 'http://localhost:3000';
+            window.location.href =  FRONTEND_URL;
         } catch (error) {
             console.error("Error logging out:", error);
         }
