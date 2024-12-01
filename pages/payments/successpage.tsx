@@ -42,7 +42,6 @@ const SuccessPage = () => {
 
                         // If no existing subscription, add a new one
                         if (!existingSubscription) {
-                            console.log("calculateEndDate",calculateEndDate(session.metadata.plan_name));
                             const subscriptionData = {
                                 User: userEmail, // Update with actual user data
                                 SubscriptionType: subscriptionType,
@@ -53,7 +52,6 @@ const SuccessPage = () => {
                                 PaymentStatus: session.payment_status,
                                 SubscriptionDetails:session
                             };
-                            console.log("subscriptionData", subscriptionData);
                             await addSubscription(subscriptionData);
                             setIsSubscribedFlag(true);
                         }
@@ -64,7 +62,6 @@ const SuccessPage = () => {
                         setPaymentStatus('failed');
                     }
                 } catch (error) {
-                    console.log(error);
                     setPaymentStatus('error');
                 }
             }

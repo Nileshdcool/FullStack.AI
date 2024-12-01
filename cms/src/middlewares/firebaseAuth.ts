@@ -13,11 +13,9 @@ const firebaseAuth = () => {
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
       ctx.state.user = decodedToken;
-      console.log("decodedToken", decodedToken);
 
       await next();
     } catch (err) {
-      console.log("Error verifying Firebase token:", err);
       return ctx.unauthorized('Invalid authorization token');
     }
   };

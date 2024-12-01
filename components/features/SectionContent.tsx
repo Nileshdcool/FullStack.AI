@@ -39,7 +39,6 @@ const sortQuestionsForUnsubscribed = (questions: Question[]) => {
 
 
 export function QuestionAnswerContent({ filteredQaList, topicName }: SectionContentProps) {
-  debugger;
   const { isSubscribed, user } = useContext(AppContext);
   const [openQuestions, setOpenQuestions] = useState<Set<number>>(new Set());
   const [readStatuses, setReadStatuses] = useState<{ [key: number]: boolean }>({});
@@ -212,7 +211,6 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
       }
     } catch (error) {
       setReadStatuses((prevState) => ({ ...prevState, [questionId]: !isChecked }));
-      console.log(error)
 
     }
   };

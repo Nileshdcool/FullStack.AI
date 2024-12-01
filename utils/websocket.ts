@@ -34,7 +34,6 @@ export const connectWebSocket = (userId: string, onMessage: (data: any) => void)
 
     // Handle Socket.io disconnect
     socket.on('disconnect', () => {
-      console.log('Socket.io connection closed');
     });
 
     // Handle Socket.io error event

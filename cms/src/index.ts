@@ -21,7 +21,6 @@ export default {
    * Initializes the WebSocket server and attaches it to Strapi.
    */
   async bootstrap({ strapi }: { strapi: any }) {
-    console.log('Initializing WebSocket server...');
 
     const httpServer: HttpServer = strapi.server.httpServer;
     io = new SocketIOServer(httpServer, {

@@ -5,7 +5,6 @@ import { apiURL } from './constants';
 import { getAuth } from 'firebase/auth';
 
 const BASE_URL = process.env.REACT_APP_API_URL || apiURL;
-console.log("Base URL:", BASE_URL); 
 
 interface ApiOptions {
     method: HttpMethod;
@@ -20,7 +19,6 @@ export const httpRequest = async <T>(endpoint: string, options: ApiOptions): Pro
     
     const { method, body, headers, isSubscribed,userEmail } = options;
     const fullUrl = `${BASE_URL}${endpoint}`;
-    console.log("Making request to:", fullUrl);
 
     const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
     

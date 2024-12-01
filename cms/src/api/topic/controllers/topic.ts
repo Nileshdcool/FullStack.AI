@@ -19,7 +19,6 @@ export default factories.createCoreController('api::topic.topic', ({ strapi }) =
     const userEmail = Array.isArray(ctx.request.headers['x-user-email']) 
       ? ctx.request.headers['x-user-email'][0] 
       : ctx.request.headers['x-user-email'];
-    console.log("User Email:", userEmail);
 
     try {
       // Fetch topic with questions and respective answers

@@ -90,7 +90,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             const sessionKey = getSessionKey(user);
             localStorage.removeItem(sessionKey);
             window.location.href =   process.env.FRONTEND_URL || 'http://localhost:3000';
-            console.log("User logged out from Firebase");
         } catch (error) {
             console.error("Error logging out:", error);
         }
