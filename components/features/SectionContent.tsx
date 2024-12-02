@@ -49,7 +49,7 @@ export function QuestionAnswerContent({ filteredQaList, topicName }: SectionCont
   const [buttonLabel, setButtonLabel] = useState<string>('Generate PDF');
   const [selectedTopicName, setSelectedTopicName] = useState<string>('Generate PDF');
   const [loading, setLoading] = useState(false); // Loading state
-  const [selectedFont, setSelectedFont] = useState<FontToRead>(questionAnswerPrimaryFont);
+  const [selectedFont] = useState<FontToRead>(questionAnswerPrimaryFont);
 
   useEffect(() => {
 

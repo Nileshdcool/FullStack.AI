@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import hljs from 'highlight.js';
 import axios from 'axios';
-import { questionAnswerPrimaryFont, questionAnswerSecondaryFont } from '../../../../config/constants';
+import { BACKEND_URL, questionAnswerPrimaryFont, questionAnswerSecondaryFont } from '../../../../config/constants';
 // Define interfaces for Answer and Question
 interface Answer {
   id: number;
@@ -22,7 +22,7 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
   async generatePdf(ctx) {
     try {
 
-      const highlightJsCssUrl = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/atom-one-dark.min.css";
+      const highlightJsCssUrl = `${BACKEND_URL}/files/atom-one-dark.css`
       const highlightCss = await axios.get(highlightJsCssUrl).then(response => response.data);
 
       const userId = Array.isArray(ctx.request.headers['x-user-email'])
