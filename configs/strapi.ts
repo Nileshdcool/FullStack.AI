@@ -1,7 +1,9 @@
 import Strapi from "strapi-sdk-js"
+import { BACKEND_URL } from "@/cms/config/constants";
+
 
 const strapi = new Strapi({
-    url: "http://localhost:1337",
+    url: BACKEND_URL,
     prefix: "/api",
     store: {
         key: "strapi_jwt",

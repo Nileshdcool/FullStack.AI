@@ -1,9 +1,11 @@
 import { factories } from '@strapi/strapi';
 import { sendMessage } from '../services/websocket';
-const puppeteer = require('puppeteer');
+import puppeteer from 'puppeteer';
 import path from 'path';
 import fs from 'fs';
-
+import hljs from 'highlight.js';
+import axios from 'axios';
+import { BACKEND_URL, questionAnswerPrimaryFont, questionAnswerSecondaryFont } from '../../../../config/constants';
 // Define interfaces for Answer and Question
 interface Answer {
   id: number;
@@ -19,6 +21,10 @@ interface Question {
 export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
   async generatePdf(ctx) {
     try {
+
+      const highlightJsCssUrl = `${BACKEND_URL}/files/atom-one-dark.css`
+      const highlightCss = await axios.get(highlightJsCssUrl).then(response => response.data);
+
       const userId = Array.isArray(ctx.request.headers['x-user-email'])
         ? ctx.request.headers['x-user-email'][0]
         : ctx.request.headers['x-user-email'];
@@ -67,128 +73,117 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
       const filteredQuestions = questions.filter(q => q.answers && q.answers.length > 0);
 
       const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
+      <!DOCTYPE html>
+      <html>
+      <head>
         <style>
-  body {
-    font-family: Georgia;
-    margin: 0;
-    padding: 0;
-    line-height: 1.5;
-    padding-top: 50px;
-  }
-  .heading {
-    font-size: 12px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 50px;
-    margin-bottom: 20px;
-    color: #222;
-  }
-    .topic-name {
-    font-size: 30px;
-    font-weight: normal;
-    text-align: center;
-    margin-top: 16px; /* Added space to the top */
-    margin-bottom: 7px; /* Keeps bottom spacing compact */
-    color: #333;
-  }
-
-  .watermark {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    pointer-events: none;
-    transform: rotate(-45deg);
-    font-size: 60px;
-    font-weight: bold;
-    color: rgba(50, 50, 50, 0.5);
-  }
-  .question {
-    margin-bottom: 5px;
-    page-break-inside: avoid;
-  }
-  .question.new-page {
-    page-break-before: always;
-  }
- .question-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 5px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  margin-left: 10px; /* Align with answer margin */
-}
-
-.answer {
-  font-size: 14px;
-  margin-left: 10px; /* Ensures the same margin as question */
-  margin-bottom: 5px; 
-  color: #555;
-  background-color: rgba(229, 231, 235, 0.8);
-  padding: 5px;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-  .answer strong {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-  }
-  .page {
-    page-break-inside: avoid;
-    margin-bottom: 30px; 
-    padding-left: 50px;
-    padding-right: 50px;
-  }
-  @media print {
-    body {
-      margin: 0;
-      padding: 0;
-    }
-    .page {
-      margin-bottom: 40px; 
-    }
-  }
-</style>
-
-        </head>
-        <body>
-          ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''}
-          <div class="topic-name">${topicName}</div>
-          ${filteredQuestions.map((q, i) => `
-            <div class="page">
-              <div class="question">
-                <div class="question-title">Q${i + 1}: ${q.Content}</div>
-                ${q.answers.length > 1
-          ? q.answers.map((a, j) => `
+          ${highlightCss}  
+        </style>
+        <style>
+          body {
+            font-family: ${questionAnswerPrimaryFont}, ${questionAnswerSecondaryFont};
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+          }
+          .topic-name {
+            font-size: 30px;
+            font-weight: normal;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 15px; /* Adjust to match with question section */
+            padding-top: 0;
+            color: #333;
+          }
+        .watermark {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+          pointer-events: none;
+          transform: rotate(-45deg);
+          font-size: 60px;
+          font-weight: bold;
+          color: rgba(50, 50, 50, 0.5);
+        }
+        .question {
+            margin-top: 0;
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+          }
+          .question-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-left: 10px;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          }
+          .answer {
+            font-size: 14px;
+            margin-left: 10px;
+            margin-bottom: 10px;
+            color: #555;
+            background-color: rgba(229, 231, 235, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          }
+          pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.5;
+          }
+          code {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 700; /* Add this to adjust the font weight */
+          }
+        </style>
+      </head>
+      <body>
+       ${!userId ? `<div class="watermark">Elevar.AI</div>` : ''}
+        <div class="topic-name">${topicName}</div>
+        ${filteredQuestions
+          .map(
+            (q, i) => `
+            <div class="question">
+              <div class="question-title">Q${i + 1}: ${q.Content}</div>
+              ${q.answers
+                .map((a, j) => {
+                  const contentParts = a.content.split('```');
+                  const formattedAnswer = contentParts
+                    .map((part, index) =>
+                      index % 2 === 0
+                        ? `<div>${part}</div>` 
+                        : `<pre><code>${hljs.highlightAuto(part).value}</code></pre>` 
+                    )
+                    .join('');
+                  return `
                     <div class="answer">
                       <strong>Answer ${j + 1}:</strong>
-                      <div>${a.content}</div>
+                      ${formattedAnswer}
                     </div>
-                  `).join('')
-          : `
-                    <div class="answer">
-                      <strong>Answer:</strong>
-                      <div>${q.answers[0]?.content}</div>
-                    </div>
-                  `}
-              </div>
+                  `;
+                })
+                .join('')}
             </div>
-          `).join('')}
-        </body>
-        </html>
+          `
+          )
+          .join('')}
+      </body>
+      </html>
       `;
-
+      
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.setContent(htmlContent);
@@ -197,10 +192,12 @@ export default factories.createCoreController('api::pdf.pdf', ({ strapi }) => ({
         printBackground: true,
         format: 'A4',
         displayHeaderFooter: true,
-        headerTemplate: `<div style="font-size: 13px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;margin-bottom: 12px;">Elevar.AI - Kill Your Interview</div>`,
+        headerTemplate: `<div style="font-size: 13px; font-weight: normal; font-style: italic; text-align: center; width: 100%; padding: 2px 0;margin-bottom: 5px;">Elevar.AI - Kill Your Interview</div>`,
         footerTemplate: `<div style="font-size: 13px; text-align: center; width: 100%; padding: 10px 0;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
-        margin: { top: '40px', bottom: '80px', left: '10px', right: '10px' },
-      });
+        margin: { top: '40px', bottom: '80px', left: '40px', right: '40px' },
+
+    });
+    
 
       await browser.close();
       fs.writeFileSync(filePath, pdfBuffer);

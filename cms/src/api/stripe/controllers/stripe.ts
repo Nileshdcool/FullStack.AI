@@ -1,10 +1,11 @@
 import Stripe from 'stripe';
 import { Context } from 'koa'; // Import the context type from Koa
+import { FRONTEND_URL } from '../../../../config/constants';
 
 
 // Your Stripe Secret Key
 const secretKey = process.env.REACT_APP_STRIPE_SECRET_KEY;
-const baseUrl = process.env.REACT_APP_BASE_URL;
+const baseUrl = FRONTEND_URL;
 
 // Ensure the secret key is defined
 if (!secretKey) {
@@ -43,16 +44,12 @@ const stripeController = {
     // Create a Checkout Session for managing the checkout flow
     async createCheckoutSession(ctx: Context) {
         try {
-            console.log("called createCheckoutSession");
 
-            console.log("User from Firebase Middleware:", ctx.state.user); // Log the user
             if (!ctx.state.user) {
             return ctx.unauthorized('User not authenticated');
             }
 
-            console.log("ctx.request.body", ctx.request.body);
             const { amount, userEmail, selectedPlanName } = ctx.request.body; // Get amount from the request body
-            console.log(amount, userEmail, selectedPlanName);
 
             let sessionData: any = {
                 payment_method_types: ['card'],  // Only card payment methods
@@ -129,7 +126,6 @@ const stripeController = {
     },
 
     async handleStripeWebhook(ctx: Context) {
-        console.log("handleStripeWebhook called");
         const rawBody = ctx.request.body[Symbol.for('unparsedBody')];
         const sig = ctx.request.headers['stripe-signature']; // Get the signature from the headers
 
@@ -152,7 +148,6 @@ const stripeController = {
 
             if (event.type === 'invoice.payment_succeeded') {
                 const invoice = event.data.object;
-                console.log("event.data.object", event.data.object);
                 const customerEmail = invoice.customer_email;
 
                 const stripePaymentId = typeof invoice.payment_intent === 'string'
@@ -182,9 +177,7 @@ const stripeController = {
                     },
                 });
 
-                console.log("Subscription data inserted successfully.");
             } else {
-                console.log(`Unhandled event type: ${event.type}`);
             }
 
             ctx.body = { received: true };

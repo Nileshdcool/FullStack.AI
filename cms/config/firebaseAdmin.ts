@@ -28,8 +28,6 @@ if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(firebaseConfig as admin.ServiceAccount),  // Correct type assertion
   });
-} else {
-  console.log("Admin SDK already initialized");
 }
 
 export default admin;
