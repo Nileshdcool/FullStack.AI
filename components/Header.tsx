@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import Avatar from 'react-avatar';
-import SlideDown from 'react-slidedown';
-import 'react-slidedown/lib/slidedown.css';
 import { AppContext } from '../context/AppContext';
 
 interface HeaderProps {
@@ -50,31 +48,35 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
               style={{ cursor: 'pointer' }}
             />
             {isMenuOpen && (
-              <SlideDown>
-                <div
-                  className="menu absolute bg-white shadow-lg rounded p-4"
-                  ref={menuRef}
-                  style={{ position: 'absolute', top: '50px', right: '0' }}
-                >
-                  <ul className="space-y-2">
-                    <li>
-                      <Link href="/profile" className="block text-gray-700 hover:text-gray-900" onClick={closeMenu}>
-                        Profile
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/settings" className="block text-gray-700 hover:text-gray-900" onClick={closeMenu}>
-                        Settings
-                      </Link>
-                    </li>
-                    <li>
-                      <button onClick={() => { logout(); closeMenu(); }} className="w-full text-left text-gray-700 hover:text-gray-900">
-                        Logout
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </SlideDown>
+              <div
+                className="menu absolute bg-white shadow-lg rounded p-4"
+                ref={menuRef}
+                style={{ position: 'absolute', top: '50px', right: '0', zIndex: 10 }}
+              >
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/profile" className="block text-gray-700 hover:text-gray-900" onClick={closeMenu}>
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/settings" className="block text-gray-700 hover:text-gray-900" onClick={closeMenu}>
+                      Settings
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        logout();
+                        closeMenu();
+                      }}
+                      className="w-full text-left text-gray-700 hover:text-gray-900"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              </div>
             )}
 
             {!isSubscribed && (
@@ -101,8 +103,6 @@ export default function Header({ openModal, openLoginSignupModal }: HeaderProps)
               Unlock 5000+ Answers
             </button>
           </>
-
-
         )}
       </div>
     </header>
